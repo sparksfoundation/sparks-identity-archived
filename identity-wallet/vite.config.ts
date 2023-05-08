@@ -8,7 +8,6 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'prompt',
-      devOptions: { enabled: true },
       includeAssets: ['fonts/*.ttf', '*.svg'],
       manifest: {
         name: 'sparks-id',
