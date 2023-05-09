@@ -10,7 +10,6 @@ type Inputs = {
   password: String,
 };
 
-
 const Unlock = (props:any) => {
   const [ baseName, nonce, identity ] = props.registered.value.split(' ')
   const name = base64ToAscii(baseName)

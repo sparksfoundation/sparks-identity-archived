@@ -1,15 +1,16 @@
 import { forwardRef } from "react";
 import { ButtonProps, H1Props, InputProps, LabelProps, MainProps, PProps, SVGProps } from "react-html-props"
 import { useNavigate } from "react-router-dom"
+import { twMerge } from "tailwind-merge";
 
 export function Main({ children, className = '', ...props }: MainProps) {
   return (
     <main
-      className={"p-5 bg-gray-50 h-full w-full flex flex-col justify-center items-center" + className}
+      className={"p-5 bg-gray-50 h-full w-full flex flex-col justify-center items-center "}
       {...props}
     >
-      <div className="fixed top-0 left-0 w-full text-center p-2 bg-orange-800 text-white font-semibold text-xs">in active development - expect breaking changes</div>
-      <div className="w-full max-w-lg h-full flex flex-col justify-center items-center">
+      <div className="fixed z-10 top-0 left-0 w-full text-center p-2 bg-orange-800 text-white font-semibold text-xs">in active development - expect breaking changes</div>
+      <div className={twMerge(`pt-10 w-full max-w-lg h-full flex flex-col justify-center items-center ${className}`)}>
         {children}
       </div>
     </main>
@@ -52,6 +53,17 @@ export function H1({ children, className = '', ...props }: H1Props) {
   return (
     <h1
       className={"text-4xl text-gray-800 font-bold " + className}
+      {...props}
+    >
+      {children}
+    </h1>
+  )
+}
+
+export function H4({ children, className = '', ...props }: H1Props) {
+  return (
+    <h1
+      className={"text-xl text-gray-800 font-bold " + className}
       {...props}
     >
       {children}
@@ -108,7 +120,7 @@ export const Input = forwardRef<HTMLInputElement, SparksInputProps>(({ className
   return (
     <input
       ref={ref}
-      className={"block w-full rounded-md border-0 p-2.5 text-gray-700 shadow-sm placeholder:text-gray-400 sm:text-sm sm:leading-6 ring-1 ring-inset focus:ring-2 focus:ring-inset " + className}
+      className={twMerge(`block w-full bg-white rounded-md border-0 p-2.5 text-gray-700 shadow-sm placeholder:text-gray-400 sm:text-sm sm:leading-6 ring-1 ring-inset focus:ring-2 focus:ring-inset ${className}`)}
       {...props}
     />
   )

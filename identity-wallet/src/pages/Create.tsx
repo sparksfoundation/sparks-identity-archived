@@ -35,7 +35,7 @@ function Create() {
         <Input className='mb-1' type="name" error={!!errors.name} {...register('name', { required: true })} />
         {errors.name ? <InputError>an account name is required</InputError> : ''}
         <Label className='mt-6'>Master Password (8 or more characters)</Label>
-        <Input className='mb-1' type="password" error={!!errors.password} {...register('password', { required: true, minLength: 10 })} />
+        <Input className='mb-1' type="password" error={!!errors.password} {...register('password', { required: true, minLength: 8 })} />
         {errors.password ? <InputError>invalid password: {errors.password.type} condition not met</InputError> : ''}
         <Button className='mt-6' type="submit">create account</Button>
       </form>
