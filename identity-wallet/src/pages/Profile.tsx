@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Main, H1, H4, Input, Button } from '../modules/components/elements/Primitives'
+import { Main, Input, Button } from '../modules/components/elements/Primitives'
 import { useIdentity } from '../modules/identity/provider'
 import { PencilSquareIcon } from '@heroicons/react/20/solid'
 
