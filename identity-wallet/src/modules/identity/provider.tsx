@@ -6,7 +6,7 @@ import { storage } from '../utilities/storage'
 interface IdentityContextType {
   name: string | null,
   nonce: string | null,
-  avatar: string | null,
+  avatar: string,
   publicKey: string | null,
   login: Function,
   logout: Function,
@@ -30,7 +30,7 @@ interface keys {
 export const IdentityContext = createContext<IdentityContextType>({
   name: null,
   nonce: null,
-  avatar: null,
+  avatar: defaultAvatar,
   publicKey: null,
   login: () => { },
   logout: () => { },
@@ -48,12 +48,12 @@ export default class IdentityProvider extends React.Component {
   state = {
     name: null,
     nonce: null,
-    avatar: null,
+    avatar: defaultAvatar,
     publicKey: null,
   }
 
   get name() { return this.state.name }
-  get avatar() { return this.state.avatar }
+  get avatar() { return this.state.avatar  }
   get nonce() { return this.state.nonce }
   get publicKey() { return this.state.publicKey }
 

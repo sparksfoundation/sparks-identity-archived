@@ -20,6 +20,7 @@
     "react-hook-form": "^7.43.9",
     "react-router-dom": "^6.11.1",
     "scrypt-pbkdf": "^1.1.1",
+    "tailwind-merge": "^1.12.0",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1"
   },
