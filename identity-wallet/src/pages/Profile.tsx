@@ -31,8 +31,8 @@ function App() {
 
   return (
     <Main className='justify-start'>
-      <div className='group relative max-h-36 mb-6'>
-        <img className='relative rounded-full h-full w-full mb-10' src={avatar} alt="avatar" />
+      <div className='group relative mb-6'>
+        <img className='relative rounded-full w-40 h-40 object-cover' src={avatar} alt="avatar" />
         <label className='absolute cursor-pointer bottom-0 right-0 opacity-0 group-hover:opacity-100 transition-all'>
           <input className='opacity-0 w-5 h-5' type="file" name="avatar" onChange={updateAvatar} />
           <PencilSquareIcon className="absolute top-0 left-0 h-5 w-5 text-gray-700" />
