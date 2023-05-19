@@ -1,7 +1,6 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Main, H1, Logo, Button, P, Label, Input, InputError } from '../modules/components/elements/Primitives'
 import { useIdentity } from '../modules/identity/provider'
-import { base64ToAscii } from '../modules/identity/utilities';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { storage } from '../modules/utilities/storage';
 
@@ -10,9 +9,9 @@ type Inputs = {
   password: String,
 };
 
-const Unlock = (props:any) => {
-  const [ baseName, nonce, identity ] = props.registered.value.split(' ')
-  const name = base64ToAscii(baseName)
+const Unlock = ({ registered = {} }: any) => {
+  const { name } = registered
+
   const navigate = useNavigate()
 
   if (!name.length) {
@@ -25,15 +24,15 @@ const Unlock = (props:any) => {
   const onSubmit: SubmitHandler<Inputs> = async (data, e) => {
     e?.preventDefault()
     const password = data.password
-    login({ identity, nonce, password })
-    .catch(() => {
-      setError('password', { type: '', message: 'invalid password' });
-    })
+    login({ identity: registered.data, password })
+      .catch(() => {
+        setError('password', { type: '', message: 'invalid password' });
+      })
   }
 
   const deleteAccount = function () {
     if (confirm('are you sure? this can\'t be undone, you will not be able to recover your account')) {
-      storage.removeItem(props.registered.key).then(() => {
+      storage.removeItem(registered.nonce).then(() => {
         logout()
         navigate(0)
       })
@@ -41,7 +40,7 @@ const Unlock = (props:any) => {
   }
 
   return (
-    <Main>
+    <Main className='flex flex-col items-center justify-start'>
       <Logo className='mb-4' height={100} width={100} />
       <H1 className='mb-6'>SPARKS ID</H1>
       <P className='text-justify mb-6'>

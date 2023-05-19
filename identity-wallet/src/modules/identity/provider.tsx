@@ -1,169 +1,140 @@
 import React, { useContext, createContext } from 'react'
-import * as utils from './utilities'
-import defaultAvatar from './avatar'
-import { storage } from '../utilities/storage'
+import Identity from './Identity';
+import { storage } from '../utilities/storage';
 
-interface IdentityContextType {
-  name: string | null,
-  nonce: string | null,
-  avatar: string,
-  publicKey: string | null,
-  login: Function,
-  logout: Function,
-  create: Function,
-  setName: Function,
-  setAvatar: Function,
-  encrypt: Function,
+type Nullable<T> = T | null;
+
+type TIdentityProps = {
+  readonly name: Nullable<string>;
+  readonly nonce: Nullable<string>;
+  readonly avatar: Nullable<string>;
+  readonly keyIndex: Nullable<number>;
+  readonly eventLog: Array<{
+    type: string;
+    currentPublicKey: string;
+    nextPublicKeyHash: string;
+    signedEvent?: string;
+  }>;
+  readonly publicKey?: Nullable<string>;
 }
 
-interface keys {
-  encryption: {
-    publicKey: string | null,
-    secretKey: string | null,
-  },
-  signing: {
-    publicKey: string | null,
-    secretKey: string | null,
-  }
+interface IdentityContextType {
+  readonly name: Nullable<string>;
+  readonly nonce: Nullable<string>;
+  readonly avatar: Nullable<string>;
+  readonly keyIndex: Nullable<number>;
+  readonly eventLog: Array<{
+    type: string;
+    currentPublicKey: string;
+    nextPublicKeyHash: string;
+    signedEvent?: string;
+  }>;
+  readonly publicKeys?: Nullable<object>;
+  readonly identifier?: Nullable<string>;
+  readonly save: Function;
+  readonly login: Function;
+  readonly logout: Function;
+  readonly create: Function;
+  readonly setName: Function;
+  readonly setAvatar: Function;
+  readonly rotateKeys: Function;
 }
 
 export const IdentityContext = createContext<IdentityContextType>({
   name: null,
   nonce: null,
-  avatar: defaultAvatar,
-  publicKey: null,
+  avatar: null,
+  keyIndex: null,
+  eventLog: [],
+  publicKeys: null,
+  identifier: null,
+  save: () => { },
   login: () => { },
   logout: () => { },
   create: () => { },
   setName: () => { },
   setAvatar: () => { },
-  encrypt: () => { },
+  rotateKeys: () => { },
 })
 
 export const useIdentity = () => useContext(IdentityContext)
 
 export default class IdentityProvider extends React.Component {
-  private keys: keys;
-
-  state = {
-    name: null,
-    nonce: null,
-    avatar: defaultAvatar,
-    publicKey: null,
-  }
-
-  get name() { return this.state.name }
-  get avatar() { return this.state.avatar  }
-  get nonce() { return this.state.nonce }
-  get publicKey() { return this.state.publicKey }
+  #identity = new Identity()
+  state = {} as TIdentityProps
 
   constructor(props: any) {
     super(props)
-    this.keys = {
-      encryption: { publicKey: null, secretKey: null },
-      signing: { publicKey: null, secretKey: null }
-    }
+    this.state = { ...this.#identity }
+    this.save = this.save.bind(this)
+    this.login = this.login.bind(this)
+    this.logout = this.logout.bind(this)
+    this.create = this.create.bind(this)
+    this.save = this.save.bind(this)
+    this.setName = this.setName.bind(this)
+    this.setAvatar = this.setAvatar.bind(this)
+    this.rotateKeys = this.rotateKeys.bind(this)
   }
 
-  create = ({ name, password }: { name: string, password: string }) => {
+  async update() {
     return new Promise(async (resolve) => {
-      const nonce = utils.randomNonce()
-      const keys = await utils.keypairsFromPassword({ nonce, password })
-      const publicKey = keys.signing.publicKey
-      const avatar = defaultAvatar
-      this.keys = keys
-      this.setState({
-        name,
-        nonce,
-        avatar,
-        publicKey,
+      this.setState({ 
+        ...this.#identity, 
+        publicKeys: this.#identity.publicKeys,
+        identifier: this.#identity.identifier,
       }, async () => {
-        if (!this.nonce) return
-        await storage.setItem(this.nonce, this.encrypt())
         resolve(true)
       })
     })
   }
 
-  login = ({ identity: data, nonce, password }: { identity: string, nonce: string, password: string }) => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const keys = await utils.keypairsFromPassword({ nonce, password })
-        const secretKey = keys.encryption.secretKey
-        const publicKey = keys.signing.publicKey
-        const state = utils.secretbox.decrypt({ data, secretKey })
-        this.keys = keys
-        this.setState({
-          ...state,
-          publicKey,
-        }, async () => {
-          if (!this.nonce) return
-          await storage.setItem(this.nonce, this.encrypt())
-          resolve(true)
-        })
-      } catch ({ message }: any) {
-        reject(message)
-      }
-    })
+  async save() {
+    if (!this.state.nonce || !this.state.name) return
+    const data = await this.#identity.export()
+    await storage.setItem(this.state.nonce, data)
   }
 
-  logout = () => {
-    return new Promise((resolve) => {
-      this.setState({
-        name: null,
-        nonce: null,
-        avatar: null,
-        publicKey: null,
-      }, () => resolve(true))
-    })
+  async login({ identity, password }: { identity: string, password: string }) {
+    await this.#identity.import({ identity, password })
+    await this.update()
   }
 
-  encrypt = (): string => {
-    const encrypted = utils.secretbox.encrypt({
-      // @ts-ignore
-      data: this.toJSON(),
-      // @ts-ignore
-      secretKey: this.keys.encryption.secretKey,
-    })
-    if (!this.name) throw Error('invalid')
-    return `${utils.asciiToBase64(this.name)} ${this.nonce} ${encrypted}`
+  async logout() { }
+
+  async create({ name, password }: { name: string, password: string }) {
+    await this.#identity.create({ name, password })
+    await this.update()
+    await this.save()
   }
 
-  toJSON = () => {
-    return this.state
+  async setName(name : string) {
+    this.#identity.name = name
+    await this.update()
+    await this.save()
   }
 
-  setName = (name: string) => {
-    return new Promise((resolve) => {
-      const update = { ...this.state, name }
-      this.setState(update, async () => {
-        if (!this.nonce) return
-        await storage.setItem(this.nonce, this.encrypt())
-        resolve(true)
-      })
-    })
+  async setAvatar(avatar : string) {
+    this.#identity.avatar = avatar
+    await this.update()
+    await this.save()
   }
 
-  setAvatar = (avatar: string) => {
-    return new Promise((resolve) => {
-      const update = { ...this.state, avatar }
-      this.setState(update, async () => {
-        if (!this.nonce) return
-        await storage.setItem(this.nonce, this.encrypt())
-        resolve(true)
-      })
-    })
+  async rotateKeys() {
+    await this.#identity.rotate()
+    await this.update()
+    await this.save()
   }
 
   render = () => {
     const value = {
       ...this.state,
+      save: this.save,
       login: this.login,
       logout: this.logout,
       create: this.create,
       setName: this.setName,
       setAvatar: this.setAvatar,
-      encrypt: this.encrypt,
+      rotateKeys: this.rotateKeys,
     }
 
     return (

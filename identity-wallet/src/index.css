@@ -2,12 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root {
+html,
+body,
+#root {
   margin: 0;
   height: 100%;
   width: 100%;
 }
 
-input, textarea, button {
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity));
+}
+
+input,
+textarea,
+button {
   outline: none;
 }
