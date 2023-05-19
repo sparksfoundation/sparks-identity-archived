@@ -21,7 +21,7 @@ function Create() {
   }
 
   return (
-    <Main>
+    <Main className='flex flex-col items-center justify-start'>
       <Logo className='mb-4' height={100} width={100} />
       <H1 className='mb-6'>SPARKS ID</H1>
       <P className='text-justify mb-6'>

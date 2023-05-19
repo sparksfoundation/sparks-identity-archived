@@ -6,11 +6,11 @@ import { twMerge } from "tailwind-merge";
 export function Main({ children, className = '', ...props }: MainProps) {
   return (
     <main
-      className={"p-5 bg-gray-50 h-full w-full flex flex-col justify-center items-center "}
+      className={"p-8 bg-gray-50 w-full flex flex-col justify-center items-center min-h-screen"}
       {...props}
     >
       <div className="fixed z-10 top-0 left-0 w-full text-center p-2 bg-orange-800 text-white font-semibold text-xs">in active development - expect breaking changes</div>
-      <div className={twMerge(`pt-10 w-full max-w-lg h-full flex flex-col justify-center items-center ${className}`)}>
+      <div className={twMerge(`pt-10 min-h-full w-full max-w-lg h-full ${className}`)}>
         {children}
       </div>
     </main>
