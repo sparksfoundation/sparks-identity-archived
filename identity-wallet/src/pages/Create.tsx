@@ -26,7 +26,7 @@ function Create() {
       <H1 className='mb-6'>SPARKS ID</H1>
       <P className='text-justify mb-6'>
         To setup your SPARKS Identity, you'll need to provide name and a master 
-        password. The name is for you convenience and the password used to generate 
+        password. The name is for your convenience and the password used to generate 
         your unique identity and protect your digital information. It's important to 
         choose a strong, unique password that only you know and won't forget.
       </P>
