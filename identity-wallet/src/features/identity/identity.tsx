@@ -1,7 +1,7 @@
 import nacl from 'tweetnacl'
 import naclUtil from 'tweetnacl-util'
 import * as scrypt from 'scrypt-pbkdf'
-import { avatar } from './avatar.tsx'
+import { avatar } from './avatar.js'
 import { Buffer } from 'buffer'
 
 type Nullable<T> = T | null;
