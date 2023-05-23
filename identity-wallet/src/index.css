@@ -3,11 +3,24 @@
 @tailwind utilities;
 
 html, body, #root {
-  margin: 0;
   height: 100%;
+  margin: 0;
+  scroll-behavior: smooth;
+}
+
+#root {
+  height: calc(100% - 1.25rem);
+  top: 1.25rem;
+  position: absolute;
+  left: 0;
   width: 100%;
 }
 
-input, textarea, button {
-  outline: none;
+body {
+  display: block;
+}
+
+body.loading, body.loading * {
+  display: none;
+  transition: none !important;
 }
