@@ -1,0 +1,1 @@
+export const Apps = () => <h1>Apps</h1>
