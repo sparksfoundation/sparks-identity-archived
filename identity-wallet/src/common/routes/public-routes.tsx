@@ -10,7 +10,7 @@ const CreateRedirect = () => {
   const isUnlock = matchPath('/auth/unlock', location.pathname)
   const isRoot = matchPath('/auth', location.pathname)
   const hasMembers = members.length !== 0
-  
+
   if (user) {
     return <Navigate to="/user" />
   } else if (hasMembers) {

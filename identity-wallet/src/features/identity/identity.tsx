@@ -31,6 +31,7 @@ export type TIdentity = {
   eventLog: Array<TIdentityEvent>;
   identifier: Nullable<string>;
   publicKeys: Nullable<object>;
+  getKeys: Function;
   create: Function;
   rotate: Function;
   destroy: Function;
@@ -58,6 +59,10 @@ export class Identity implements TIdentity {
       signing: this.#currKeys.signing.publicKey,
       encryption: this.#currKeys.encryption.publicKey,
     }
+  }
+
+  getKeys() {
+    return this.#currKeys
   }
 
   async create({ name, password }: { name: string, password: string }) {
