@@ -2,6 +2,7 @@ import { H5, P } from "@components/elements"
 import { Card } from "@components/elements/card"
 import sparksfoundation from '../assets/covers/sparksfoundation.png'
 import { Button } from "@components/elements/buttons"
+// @ts-ignore
 import { connect } from "@features/channels"
 import { useUser } from "@stores/user"
 import { useState } from "react"
