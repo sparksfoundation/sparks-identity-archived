@@ -1,4 +1,3 @@
-// @ts-ignore 
 import { CockPit } from "@components/layout/cockpit";
 import * as services from '@features/apps';
 
