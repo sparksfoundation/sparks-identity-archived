@@ -1,3 +1,22 @@
+## Installing the project
+
+- Install the dependencies:
+```bash
+npm install
+```
+
+- Run the development server:
+```bash
+npm run dev
+```
+
+- Building and previewing the app:
+```bash
+npm run build
+
+npm run preview
+```
+
 ## High Level Tooling Overview
 
 - Build
@@ -5,10 +24,10 @@
   - pwa helper: [vite-pwa](https://vite-pwa-org.netlify.app/)
   - style processing: [tailwind postcss + autoprifixer](https://tailwindcss.com/docs/guides/create-react-app)
   - path aliasing: [vite-tsconfig-paths](https://www.npmjs.com/package/vite-tsconfig-paths)
-- Framework 
+- Framework
   - front end: [react](https://react.dev/)
   - routing: [react-router-dom](https://reactrouter.com/web/guides/quick-start)
-  - error handling: [react-error-boundary](https://www.npmjs.com/package/react-error-boundary)     
+  - error handling: [react-error-boundary](https://www.npmjs.com/package/react-error-boundary)
 - Styling
   - css framework: [tailwind](https://tailwindcss.com/docs/plugins) & [plugins](https://tailwindcss.com/docs/plugins)
   - font management: [fontsource](https://fontsource.org/)
@@ -25,14 +44,14 @@
   - encryption & signing: [tweetnacl](https://www.npmjs.com/package/tweetnacl) & [tweetnacl-util](https://www.npmjs.com/package/tweetnacl-util)
   - key derivation: [scrypt-pdkdf](https://www.npmjs.com/package/scrypt-pbkdf)
 
-## Root Structure 
+## Root Structure
 Standard vite structure except .env files moved out of root into `src/common/config`
 ```shell
-├── dist/               # bundled distribution files 
+├── dist/               # bundled distribution files
 ├── node_modules/       # node module directory
 ├── public/             # assets only accessed by url
 ├── src/                # main project codebase
-├── index.html          # main entry file  
+├── index.html          # main entry file
 ├── .eslintrc.cjs       # es-lint configuration
 ├── .gitignore          # gitignore configuration
 ├── package-lock.json   # auto generated
@@ -63,9 +82,9 @@ Organized into common and features to faciliate reduce cross over from multiple 
     |   ├── types       # base types used across the application
     |   ├── utils       # shared utility functions
     |   └── views       # pages structured to match routes, assembly only no logic
-    |       ├── auth           
-    |       |   ├── Login.tsx   
-    |       |   └── Logout.tsx  
+    |       ├── auth
+    |       |   ├── Login.tsx
+    |       |   └── Logout.tsx
     |       └── Home.tsx
     |
     ├── features            # feature based modules
@@ -89,11 +108,11 @@ Always use named exports
 export const Hello = () => <h1>Hello</h1>
 ```
 
-export immediate children `common` & `features` folders via `index.ts`, 
+export immediate children `common` & `features` folders via `index.ts`,
 ```shell
 └── src
-    └── common          
-        └── components 
+    └── common
+        └── components
             └── button
                 ├── primary.tsx
                 ├── secondary.tsx
