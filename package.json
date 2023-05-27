@@ -1,0 +1,7 @@
+{
+  "name": "sparks-identity",
+  "description": "mono-repo for all identity specific functionality in the SPARKS ecosystem",
+  "private": true,
+  "author": "SPARKS Foundation <operations@sparks.foundation>",
+  "homepage": "https://id.sparks.foundation"
+}
