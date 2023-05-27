@@ -14,7 +14,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "ui": "0.0.1",
+    "ui": "workspace:*",
     "@fontsource/inter": "^5.0.0",
     "@headlessui/react": "^1.7.14",
     "@heroicons/react": "^2.0.18",
