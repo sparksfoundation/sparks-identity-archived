@@ -14,7 +14,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "ui": "0.0.1",
     "@fontsource/inter": "^5.0.0",
     "@headlessui/react": "^1.7.14",
     "@heroicons/react": "^2.0.18",
@@ -37,6 +36,7 @@
     "tailwind-merge": "^1.12.0",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
+    "ui": "workspace:*",
     "zod": "^3.21.4",
     "zustand": "^4.3.8"
   },
@@ -55,6 +55,7 @@
     "typescript": "^5.0.2",
     "vite": "^4.3.2",
     "vite-plugin-pwa": "^0.15.0",
-    "vite-tsconfig-paths": "^4.2.0"
+    "vite-tsconfig-paths": "^4.2.0",
+    "workbox-window": "^6.6.0"
   }
 }
