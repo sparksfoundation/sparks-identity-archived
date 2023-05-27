@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  scroll-behavior: smooth;
+}
+
+#root {
+  height: calc(100% - 1.25rem);
+  top: 1.25rem;
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+
+body {
+  display: block;
+}
+
+body.loading, body.loading * {
+  display: none;
+  transition: none !important;
+}
+
+#dev {
+  display: none !important; 
+}
+
+body.dark #dev,
+body.light #dev {
+  display: block !important;
+}
