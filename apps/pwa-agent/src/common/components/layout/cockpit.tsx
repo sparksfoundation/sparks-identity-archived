@@ -7,7 +7,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import { Cog6ToothIcon, EnvelopeIcon, HomeModernIcon, IdentificationIcon, PuzzlePieceIcon } from "@heroicons/react/24/solid"
+import { Cog6ToothIcon, HomeModernIcon, IdentificationIcon, PuzzlePieceIcon, TicketIcon } from "@heroicons/react/24/solid"
 import { H4, Logo, Noise } from "@components/elements"
 import { ThemeSwitcher } from "@components/elements/theme-switcher"
 import { Link } from "react-router-dom";
@@ -16,7 +16,7 @@ const navigation = [
   { name: 'Dashboard', href: '/user/dashboard', icon: HomeModernIcon, current: true },
   { name: 'Credentials', href: '#', icon: IdentificationIcon, current: false },
   { name: 'Applications', href: '/user/apps', icon: PuzzlePieceIcon, current: false },
-  { name: 'Messages', href: '#', icon: EnvelopeIcon, current: false },
+  { name: 'Watch Events', href: '/user/watch', icon: TicketIcon, current: false },
 ]
 
 const userNavigation = [

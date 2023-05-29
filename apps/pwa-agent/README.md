@@ -45,7 +45,7 @@ npm run preview
   - key derivation: [scrypt-pdkdf](https://www.npmjs.com/package/scrypt-pbkdf)
 
 ## Root Structure
-Standard vite structure except .env files moved out of root into `src/common/config`
+Standard vite structure
 ```shell
 ├── dist/               # bundled distribution files
 ├── node_modules/       # node module directory
