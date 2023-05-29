@@ -17,8 +17,7 @@ export default defineConfig({
   appType: 'spa',
   base: '/',
   publicDir: 'public',
-  envDir: './src/config',
-  envPrefix: 'PUBLIC_',
+  envPrefix: 'SPARKS_',
   plugins: [
     react(),
     nodePolyfills({

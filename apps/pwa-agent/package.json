@@ -18,10 +18,11 @@
     "@headlessui/react": "^1.7.14",
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.1.0",
+    "@hyperswarm/dht-relay": "^0.4.1",
     "@tailwindcss/forms": "^0.5.3",
     "@tailwindcss/typography": "^0.5.9",
     "clsx": "^1.2.1",
-    "hypercore": "^10.11.0",
+    "hyper-sdk": "^4.2.5",
     "idb-keyval": "^6.2.1",
     "install": "^0.13.0",
     "localforage": "^1.10.0",
@@ -37,9 +38,9 @@
     "tailwind-merge": "^1.12.0",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
+    "ui": "workspace:*",
     "zod": "^3.21.4",
-    "zustand": "^4.3.8",
-    "ui": "workspace:*"
+    "zustand": "^4.3.8"
   },
   "devDependencies": {
     "@types/react": "^18.0.28",
