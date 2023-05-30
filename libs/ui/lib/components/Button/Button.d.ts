@@ -1,19 +1,10 @@
-import React from "react";
+/// <reference types="react" />
 import { ButtonProps } from "react-html-props";
 type ButtonExtendedProps = {
-    children?: React.ReactNode;
-    xs?: boolean;
-    sm?: boolean;
-    md?: boolean;
-    lg?: boolean;
-    xl?: boolean;
-    primary?: boolean;
-    secondary?: boolean;
-    success?: boolean;
-    danger?: boolean;
-    warning?: boolean;
-    disabled?: boolean;
-    full?: boolean;
+    size: 'sm' | 'md' | 'lg';
+    color: 'primary' | 'secondary' | 'warning' | 'danger' | 'success';
+    fullWidth: boolean;
+    disabled: boolean;
 } & ButtonProps;
-declare const Button: ({ children, className, xs, sm, md, lg, xl, full, primary, secondary, success, danger, warning, disabled, ...props }: ButtonExtendedProps) => JSX.Element;
-export default Button;
+export declare const Button: (props: ButtonExtendedProps) => JSX.Element;
+export {};
