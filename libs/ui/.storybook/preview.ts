@@ -4,7 +4,6 @@ import { withThemeByDataAttribute } from '@storybook/addon-styling';
 import "@fontsource/inter";
 import "./tailwind.css";
 
-
 const preview: Preview = {
   parameters: {
     actions: { argTypesRegex: "^on[A-Z].*" },

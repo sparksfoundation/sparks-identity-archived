@@ -1,9 +1,9 @@
 import { H1, P, Triangle } from "@components/elements"
-import { Button } from "@components/elements/buttons"
 import { ThemeSwitcher } from "@components/elements/theme-switcher"
 import { Footer, Main } from "@components/layout"
 import { IntroCard } from "@features/landing-page"
 import { useNavigate } from "react-router-dom"
+import { Button } from "ui"
 
 export const Landing = () => {
   const navigate = useNavigate()
