@@ -8,6 +8,7 @@
   "main": "lib/index.js",
   "module": "lib/index.esm.js",
   "types": "lib/index.d.ts",
+  "type": "module",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
@@ -33,6 +34,7 @@
     "rollup-plugin-postcss": "^4.0.2",
     "storybook": "^7.0.18",
     "tailwindcss": "^3.3.2",
+    "tslib": "^2.5.2",
     "typescript": "^5.0.4"
   },
   "scripts": {
