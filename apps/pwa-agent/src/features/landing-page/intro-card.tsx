@@ -19,8 +19,7 @@ export const IntroCard = ({ className = '', footer, title, description, items, h
       {description}
     </P>
     <ul role="list" className={clsxm("space-y-3 leading-6 text-inherit", footer && 'mb-8')}>
-      {items.map
-        ((item, index) => (
+      {items.map ((item, index) => (
           <li key={index} className="flex gap-x-3 text-inherit items-center">
             <CheckIcon className={clsxm("h-5 w-5 flex-none text-current", highlighted && 'text-sparks-purple-600')} aria-hidden="true" />
             <P>{item}</P>

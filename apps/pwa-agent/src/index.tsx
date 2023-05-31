@@ -11,7 +11,7 @@ const updateSW = registerSW({
       updateSW(true);
     }
   },
-  onOfflineReady() {},
+  onOfflineReady() { console.log("<-----TODO------>") },
 })
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
