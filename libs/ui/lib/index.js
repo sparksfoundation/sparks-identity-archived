@@ -6208,6 +6208,16 @@ function getTheme(_a) {
         }
     };
 }
+var safelist = [
+    {
+        pattern: /(divide|border|bg|text|ring|shadow|caret|accent)-(primary|secondary|warning|danger|success|disabled|fg|bg)-.*/,
+        variants: [
+            'hover', 'focus', 'disabled', 'invalid', 'dark',
+            'dark:hover', 'darks:focus', 'dark:disabled', 'darks:invalid',
+            'focus:invalid', 'hover:invalid'
+        ]
+    }
+];
 
 var react = {exports: {}};
 
@@ -9044,4 +9054,5 @@ exports.Label = Label;
 exports.NoiseBackground = NoiseBackground;
 exports.clsxm = clsxm;
 exports.getTheme = getTheme;
+exports.safelist = safelist;
 //# sourceMappingURL=index.js.map

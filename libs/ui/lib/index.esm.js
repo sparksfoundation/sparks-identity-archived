@@ -6206,6 +6206,16 @@ function getTheme(_a) {
         }
     };
 }
+var safelist = [
+    {
+        pattern: /(divide|border|bg|text|ring|shadow|caret|accent)-(primary|secondary|warning|danger|success|disabled|fg|bg)-.*/,
+        variants: [
+            'hover', 'focus', 'disabled', 'invalid', 'dark',
+            'dark:hover', 'darks:focus', 'dark:disabled', 'darks:invalid',
+            'focus:invalid', 'hover:invalid'
+        ]
+    }
+];
 
 var react = {exports: {}};
 
@@ -9035,5 +9045,5 @@ var Label = function (_a) {
     return (React.createElement("label", __assign({ htmlFor: id, className: clsxm("mb-2 text-md font-medium", "text-fg-700 dark:text-fg-200") }, props), children));
 };
 
-export { Button, Error$1 as Error, Input, Label, NoiseBackground, clsxm, getTheme };
+export { Button, Error$1 as Error, Input, Label, NoiseBackground, clsxm, getTheme, safelist };
 //# sourceMappingURL=index.esm.js.map

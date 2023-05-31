@@ -3,7 +3,7 @@ import { ThemeSwitcher } from "@components/elements/theme-switcher"
 import { Footer, Main } from "@components/layout"
 import { IntroCard } from "@features/landing-page"
 import { useNavigate } from "react-router-dom"
-import { Button } from "@components/elements/buttons"
+import { Button } from "ui"
 
 export const Landing = () => {
   const navigate = useNavigate()
@@ -14,7 +14,7 @@ export const Landing = () => {
       <Triangle className="left-1/2 top-0 -translate-x-1/2 -translate-y-1/2" />
       <Triangle className="left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2" />
       <div className="relative flex flex-col justify-center items-center h-full p-6 max-w-4xl mx-auto">
-        <H1 className="text-center mb-2">SPARKS</H1>
+        <H1 className="text-center mb-2 ">SPARKS</H1>
         <P className="text-center text-xl sm:text-2xl mb-6">Get started with your SPARKS Identity</P>
         <div className="w-full flex items-center justify-center">
           <IntroCard
@@ -29,7 +29,7 @@ export const Landing = () => {
             title="Get Started Now"
             description="Getting started is easy! Click below to follow setup steps."
             items={['Name your identity', 'Provide a password', 'Add your credentials', 'Reclaim your identity!']}
-            footer={<Button className="w-full" onClick={() => navigate('/auth')} lg>Create</Button>}
+            footer={<Button fullWidth onClick={() => navigate('/auth')}>Create</Button>}
           />
           <IntroCard
             className="hidden 800:block"

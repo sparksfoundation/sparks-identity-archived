@@ -35,3 +35,7 @@ export declare function getTheme({ defaultTheme, defaultColors }: {
         };
     };
 };
+export declare const safelist: {
+    pattern: RegExp;
+    variants: string[];
+}[];

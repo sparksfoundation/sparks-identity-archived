@@ -42,12 +42,16 @@ declare function getTheme({ defaultTheme, defaultColors }: {
         };
     };
 };
+declare const safelist: {
+    pattern: RegExp;
+    variants: string[];
+}[];
 
 type ButtonExtendedProps = {
-    size: 'sm' | 'md' | 'lg';
-    color: 'primary' | 'secondary' | 'warning' | 'danger' | 'success';
-    fullWidth: boolean;
-    disabled: boolean;
+    size?: 'sm' | 'md' | 'lg';
+    color?: 'primary' | 'secondary' | 'warning' | 'danger' | 'success';
+    fullWidth?: boolean;
+    disabled?: boolean;
 } & ButtonProps;
 declare const Button: (props: ButtonExtendedProps) => JSX.Element;
 
@@ -77,4 +81,4 @@ type LabelExtendedProps = {
 } & LabelProps;
 declare const Label: ({ id, children, ...props }: LabelExtendedProps) => JSX.Element;
 
-export { Button, Error, Input, Label, NoiseBackground, clsxm, getTheme };
+export { Button, Error, Input, Label, NoiseBackground, clsxm, getTheme, safelist };

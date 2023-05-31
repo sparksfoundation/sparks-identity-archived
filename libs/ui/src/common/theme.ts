@@ -36,5 +36,4 @@ export function getTheme({ defaultTheme, defaultColors }: { defaultTheme: any, d
             },
         }
     }
-
 }
