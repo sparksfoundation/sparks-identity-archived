@@ -25,6 +25,12 @@ Shared libraries that are used by the `apps` or other repositories.
 You can run package commands from the root level using the filter flag eg.
 
 ```bash
-# run the dev server
-pnpm --filter wallet run dev
-``` 
+# run the pwa agent dev server
+pnpm --filter pwa-agent run dev
+
+# run the api server dev server
+pnpm --filter api-service run dev
+
+# run the linter in pwa agent
+pnpm --filter pwa-agent run lint
+```
