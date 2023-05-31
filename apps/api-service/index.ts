@@ -8,7 +8,7 @@ fastify.register(require('fastify-websocket-server')).after((error: Error) => {
 })
 
 fastify.get('/', async () => {
-    return { hello: 'asdf' }
+    return { hello: 'world' }
 })
 
 // Run the server!
