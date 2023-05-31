@@ -6,6 +6,11 @@ import { Buffer } from 'buffer'
 
 type Nullable<T> = T | null;
 
+type TUserDetails = {
+  name: string;
+  password: string;
+}
+
 type TKeyPair = {
   publicKey: string;
   secretKey: string;
@@ -31,10 +36,10 @@ export type TIdentity = {
   eventLog: Array<TIdentityEvent>;
   identifier: Nullable<string>;
   publicKeys: Nullable<object>;
-  getKeys: Function;
-  create: Function;
-  rotate: Function;
-  destroy: Function;
+  getKeys: () => Nullable<TKeyPairs>;
+  create: (userDetails: TUserDetails) => Promise<void>;
+  rotate: () => Promise<void>;
+  destroy: () => Promise<void>;
 }
 
 export class Identity implements TIdentity {
