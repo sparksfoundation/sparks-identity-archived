@@ -1,24 +1,21 @@
-const fastify = require('fastify')()
+const fastify = require('fastify')
 const { initRelay } = require('./src/swarm-relay')
 
+const server = fastify()
 
-fastify.register(require('fastify-websocket-server')).after((error: Error) => {
+server.register(require('fastify-websocket-server')).after((error: Error) => {
     if (error) throw error
-    fastify.wss.on('connection', initRelay)
+    server.wss.on('connection', initRelay)
 })
 
-fastify.get('/', async () => {
-    return { hello: 'world' }
+server.get('/', async () => {
+    return 'hello world\n'
 })
 
-// Run the server!
-const start = async () => {
-    try {
-        await fastify.listen({ port: 3400 })
-    } catch (err) {
-        fastify.log.error(err)
+server.listen({ port: process.env.PORT || 3400 }, (err: any, address: any) => {
+    if (err) {
+        console.error(err)
         process.exit(1)
     }
-}
-
-start()
+    console.log(`Server listening at ${address}`)
+})
