@@ -128,4 +128,9 @@ declare const H6: ({ className, children, color, ...props }: TextProps) => JSX.E
 declare const P: ({ className, children, color, ...props }: TextProps) => JSX.Element;
 declare const Pre: ({ className, children, color, ...props }: TextProps) => JSX.Element;
 
-export { Button, Error, H1, H2, H3, H4, H5, H6, Input, Label, Logo, NoiseBackground, P, Pre, SVGExtendedProps, TextProps, clsxm, getTheme, safelist };
+type TriangleProps = {
+    solid?: boolean;
+} & DivProps;
+declare const Triangle: ({ className, solid }: TriangleProps) => JSX.Element;
+
+export { Button, Error, H1, H2, H3, H4, H5, H6, Input, Label, Logo, NoiseBackground, P, Pre, SVGExtendedProps, TextProps, Triangle, clsxm, getTheme, safelist };

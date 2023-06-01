@@ -1,4 +1,6 @@
-import { clsxm } from '@libraries/clsxm'
+
+import React from 'react';
+import { clsxm } from "../../common/clsxm";
 import { DivProps } from 'react-html-props'
 
 const Solid = ({ className = '' }: DivProps) => (

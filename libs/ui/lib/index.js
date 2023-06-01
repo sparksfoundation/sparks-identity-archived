@@ -9133,6 +9133,24 @@ var Pre = function (_a) {
     return (React.createElement("pre", __assign({ className: clsxm(tags.pre, variants[color], className) }, props), children));
 };
 
+var Solid = function (_a) {
+    var _b = _a.className, className = _b === void 0 ? '' : _b;
+    return (React.createElement("div", { className: clsxm('absolute w-64 h-64 md:w-96 md:h-96 scale-105 opacity-60 dark:opacity-60 flex', className) },
+        React.createElement("div", { className: "absolute top-1/2 left-1/2 w-2/5 h-2/5 rounded-md bg-primary-500 bg-opacity-20", style: { transform: 'translate3d(-50%, -50%, 0) rotate(45deg)' } }),
+        React.createElement("div", { className: "absolute top-1/2 left-1/2 w-3/5 h-3/5 rounded-md bg-primary-500 bg-opacity-20", style: { transform: 'translate3d(-50%, -50%, 0) rotate(45deg)' } })));
+};
+var Outline = function (_a) {
+    var _b = _a.className, className = _b === void 0 ? '' : _b;
+    return (React.createElement("div", { className: clsxm('absolute w-64 h-64 md:w-96 md:h-96 scale-105 opacity-60 dark:opacity-60 flex', className) },
+        React.createElement("div", { className: "absolute top-1/2 left-1/2 w-1/5 h-1/5 rounded-md border-8 border-primary-500/20", style: { transform: 'translate3d(-50%, -50%, 0) rotate(45deg)' } }),
+        React.createElement("div", { className: "absolute top-1/2 left-1/2 w-2/5 h-2/5 rounded-md border-8 border-primary-500/20", style: { transform: 'translate3d(-50%, -50%, 0) rotate(45deg)' } }),
+        React.createElement("div", { className: "absolute top-1/2 left-1/2 w-3/5 h-3/5 rounded-md border-8 border-primary-500/20", style: { transform: 'translate3d(-50%, -50%, 0) rotate(45deg)' } })));
+};
+var Triangle = function (_a) {
+    var _b = _a.className, className = _b === void 0 ? '' : _b, _c = _a.solid, solid = _c === void 0 ? false : _c;
+    return solid ? React.createElement(Solid, { className: className }) : React.createElement(Outline, { className: className });
+};
+
 exports.Button = Button;
 exports.Error = Error$1;
 exports.H1 = H1;
@@ -9147,6 +9165,7 @@ exports.Logo = Logo;
 exports.NoiseBackground = NoiseBackground;
 exports.P = P;
 exports.Pre = Pre;
+exports.Triangle = Triangle;
 exports.clsxm = clsxm;
 exports.getTheme = getTheme;
 exports.safelist = safelist;

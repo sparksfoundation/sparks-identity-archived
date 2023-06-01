@@ -1,4 +1,4 @@
-import { Triangle } from "@components/elements"
+import { Triangle } from "ui"
 import { ThemeSwitcher } from "@components/elements/theme-switcher"
 import { Footer, Main } from "@components/layout"
 import { CreateIdentity } from "@features/create-page"

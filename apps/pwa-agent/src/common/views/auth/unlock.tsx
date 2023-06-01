@@ -1,4 +1,4 @@
-import { Triangle } from "@components/elements"
+import { Triangle } from "ui"
 import { ThemeSwitcher } from "@components/elements/theme-switcher"
 import { Main } from "@components/layout"
 import { UnlockIdentity } from "@features/unlock-page"
@@ -14,4 +14,4 @@ export const Unlock = () => {
       </div>
     </Main>
   )
-} 
+}
