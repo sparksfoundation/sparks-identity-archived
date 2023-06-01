@@ -27,6 +27,31 @@ export function getTheme({ defaultTheme, defaultColors }: { defaultTheme: any, d
                 fg: defaultColors.zinc,
                 bg: defaultColors.zinc,
             },
+            borderRadius: {
+                '4xl': '2rem',
+            },
+            maxWidth: {
+                '1/4': '25%',
+                '1/3': '33.333%',
+                '5/12': '41.666%',
+                '1/2': '50%',
+                '7/12': '58.333%',
+                '2/3': '66.666%',
+                '3/4': '75%',
+            },
+            maxHeight: {
+                '1/4': '25%',
+                '1/3': '33.333%',
+                '5/12': '41.666%',
+                '1/2': '50%',
+                '7/12': '58.333%',
+                '2/3': '66.666%',
+                '3/4': '75%',
+            },
+            screens: {
+                '800': '800px',
+                '500': '500px',
+            },
             opacity: {
                 '1': '0.01',
                 '2': '0.02',
@@ -34,6 +59,21 @@ export function getTheme({ defaultTheme, defaultColors }: { defaultTheme: any, d
                 '6': '0.06',
                 '8': '0.08',
             },
+            backdropBlur: {
+                '2xs': '1px',
+                'xs': '2px',
+            }
         }
     }
 }
+
+export const safelist = [
+    {
+        pattern: /(divide|border|bg|text|ring|shadow|caret|accent)-(primary|secondary|warning|danger|success|disabled|fg|bg)-.*/,
+        variants: [
+            'hover', 'focus', 'disabled', 'invalid', 'dark',
+            'dark:hover', 'darks:focus', 'dark:disabled', 'darks:invalid',
+            'focus:invalid', 'hover:invalid'
+        ]
+    }
+]

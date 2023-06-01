@@ -7,8 +7,7 @@ import { FormEventHandler, useEffect } from "react";
 import { Input } from "@components/form";
 import { Member } from "@stores/members";
 import { clsxm } from "@libraries/clsxm";
-import { H3, P } from "@components/elements";
-import { Button } from "@components/elements/buttons";
+import { Button, H3, P } from "ui"
 import { Buffer } from "buffer";
 
 const formSchema = z.object({
@@ -57,8 +56,8 @@ export const UnlockForm = ({ identity, error, className = '', onSubmit }: Unlock
           error={errors.password?.message}
         />
         <div className="flex justify-stretch gap-x-4">
-          <Button onClick={() => navigate('/')} warning full>Back</Button>
-          <Button type="submit" disabled={isSubmitting} full>Unlock</Button>
+          <Button onClick={() => navigate('/')} color="warning" fullWidth>Back</Button>
+          <Button type="submit" disabled={isSubmitting} fullWidth>Unlock</Button>
         </div>
       </form>
     </Card>

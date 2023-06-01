@@ -3,11 +3,11 @@ import { SVGProps } from "react-html-props"
 import { clsxm } from "../../common/clsxm"
 
 export type SVGExtendedProps = {
-    size: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
     mode?: 'dark' | 'light';
 } & SVGProps
 
-export const Logo = ({ size = 'md', mode }: SVGExtendedProps) => {
+export const Logo = ({ size = 'md', mode, className = '' }: SVGExtendedProps) => {
     return (
         <svg
             className={clsxm(
@@ -17,6 +17,7 @@ export const Logo = ({ size = 'md', mode }: SVGExtendedProps) => {
                 size === 'md' && 'h-20 w-20',
                 size === 'lg' && 'h-40 w-40',
                 size === 'xl' && 'h-80 w-80',
+                className
             )}
             fill="none"
             viewBox="0 0 100 100"

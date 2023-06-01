@@ -1,4 +1,4 @@
-import { H3, P } from "@components/elements";
+import { H3, P } from "ui";
 import { Card, CardProps } from "@components/elements/card";
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { clsxm } from "@libraries/clsxm";

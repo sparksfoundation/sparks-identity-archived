@@ -6198,6 +6198,31 @@ function getTheme(_a) {
                 fg: defaultColors.zinc,
                 bg: defaultColors.zinc,
             },
+            borderRadius: {
+                '4xl': '2rem',
+            },
+            maxWidth: {
+                '1/4': '25%',
+                '1/3': '33.333%',
+                '5/12': '41.666%',
+                '1/2': '50%',
+                '7/12': '58.333%',
+                '2/3': '66.666%',
+                '3/4': '75%',
+            },
+            maxHeight: {
+                '1/4': '25%',
+                '1/3': '33.333%',
+                '5/12': '41.666%',
+                '1/2': '50%',
+                '7/12': '58.333%',
+                '2/3': '66.666%',
+                '3/4': '75%',
+            },
+            screens: {
+                '800': '800px',
+                '500': '500px',
+            },
             opacity: {
                 '1': '0.01',
                 '2': '0.02',
@@ -6205,6 +6230,10 @@ function getTheme(_a) {
                 '6': '0.06',
                 '8': '0.08',
             },
+            backdropBlur: {
+                '2xs': '1px',
+                'xs': '2px',
+            }
         }
     };
 }
@@ -9017,18 +9046,14 @@ var reactExports = react.exports;
 var React = /*@__PURE__*/getDefaultExportFromCjs(reactExports);
 
 var Button = function (props) {
-    var children = props.children, _a = props.size, size = _a === void 0 ? 'md' : _a, _b = props.color, color = _b === void 0 ? 'primary' : _b, _c = props.disabled, disabled = _c === void 0 ? false : _c, _d = props.fullWidth, fullWidth = _d === void 0 ? false : _d; props.className; var rest = __rest(props, ["children", "size", "color", "disabled", "fullWidth", "className"]);
-    return (React.createElement("button", __assign({ className: clsxm('text-slate-200', 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2', 'rounded cursor-pointer', size === 'sm' && 'px-2 py-1 text-sm', size === 'md' && 'px-2.5 py-1.5 text-base', size === 'lg' && 'px-4 py-3 text-base', color === 'primary' && "bg-primary-600 hover:bg-primary-500 focus-visible:outline-primary-600", color === 'secondary' && "bg-secondary-600 hover:bg-secondary-500 focus-visible:outline-secondary-600", color === 'warning' && "bg-warning-600 hover:bg-warning-500 focus-visible:outline-warning-600", color === 'danger' && "bg-danger-600 hover:bg-danger-500 focus-visible:outline-danger-600", color === 'success' && "bg-success-600 hover:bg-success-500 focus-visible:outline-success-600", fullWidth && 'w-full', disabled && 'bg-disabled-400 hover:bg-disabled-400 cursor-default') }, rest), children));
+    var children = props.children, _a = props.size, size = _a === void 0 ? 'md' : _a, _b = props.color, color = _b === void 0 ? 'primary' : _b, _c = props.disabled, disabled = _c === void 0 ? false : _c, _d = props.fullWidth, fullWidth = _d === void 0 ? false : _d, _e = props.className, className = _e === void 0 ? "" : _e, rest = __rest(props, ["children", "size", "color", "disabled", "fullWidth", "className"]);
+    return (React.createElement("button", __assign({ type: "button", className: clsxm('text-slate-200', 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2', 'rounded cursor-pointer', size === 'sm' && 'px-2 py-1 text-sm', size === 'md' && 'px-2.5 py-1.5 text-base', size === 'lg' && 'px-4 py-3 text-base', color === 'primary' && "bg-primary-600 hover:bg-primary-500 focus-visible:outline-primary-600", color === 'secondary' && "bg-secondary-600 hover:bg-secondary-500 focus-visible:outline-secondary-600", color === 'warning' && "bg-warning-600 hover:bg-warning-500 focus-visible:outline-warning-600", color === 'danger' && "bg-danger-600 hover:bg-danger-500 focus-visible:outline-danger-600", color === 'success' && "bg-success-600 hover:bg-success-500 focus-visible:outline-success-600", fullWidth && 'w-full', disabled && 'bg-disabled-400 hover:bg-disabled-400 cursor-default', className) }, rest), children));
 };
 
-var specks = function (color) {
-    if (color === void 0) { color = "#000"; }
-    return (btoa("\n    <svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'>\n        <filter id='noiseFilter'>\n            <feTurbulence \n            type='fractalNoise' \n            baseFrequency='2.31' \n            numOctaves='6' \n            stitchTiles='stitch'/>\n        </filter>\n        <rect width='100%' height='100%' fill=\"".concat(color, "\" filter='url(#noiseFilter)'/>\n    </svg>\n")));
-};
-var NoiseBackground = function (_a) {
-    var _b = _a.shade, shade = _b === void 0 ? 'medium' : _b;
-    return (React.createElement("div", { className: clsxm(' h-full w-full absolute top-0 left-0', shade === 'light' && 'bg-white dark:bg-bg-900', shade === 'medium' && 'bg-bg-200 dark:bg-bg-950', shade === 'dark' && 'bg-bg-300 dark:bg-black') },
-        React.createElement("div", { className: clsxm("h-full w-full absolute top-0 left-0 opacity-40 dark:opacity-10"), style: { background: "url(data:image/svg+xml;base64,".concat(specks(), ")") } })));
+var Logo = function (_a) {
+    var _b = _a.size, size = _b === void 0 ? 'md' : _b, mode = _a.mode, _c = _a.className, className = _c === void 0 ? '' : _c;
+    return (React.createElement("svg", { className: clsxm('inline-block', size === 'xs' && 'h-5 w-5', size === 'sm' && 'h-10 w-10', size === 'md' && 'h-20 w-20', size === 'lg' && 'h-40 w-40', size === 'xl' && 'h-80 w-80', className), fill: "none", viewBox: "0 0 100 100", xmlns: "http://www.w3.org/2000/svg" },
+        React.createElement("path", { className: clsxm("dark:fill-bg-200 fill-bg-800", mode === 'light' && "dark:fill-bg-200 fill-bg-200", mode === 'dark' && "dark:fill-bg-800 fill-bg-800"), d: "M80.8848 47.0283L52.6849 18.8284C51.1228 17.2663 48.5901 17.2663 47.028 18.8284L18.8281 47.0283C17.266 48.5904 17.266 51.1231 18.8281 52.6852L47.028 80.8851C48.5901 82.4472 51.1228 82.4472 52.6849 80.8851L80.8848 52.6852C82.4469 51.1231 82.4469 48.5904 80.8848 47.0283Z" })));
 };
 
 var Error$1 = function (_a) {
@@ -9047,11 +9072,81 @@ var Label = function (_a) {
     return (React.createElement("label", __assign({ htmlFor: id, className: clsxm("mb-2 text-md font-medium", "text-fg-700 dark:text-fg-200") }, props), children));
 };
 
+var specks = function (color) {
+    if (color === void 0) { color = "#000"; }
+    return (btoa("\n    <svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'>\n        <filter id='noiseFilter'>\n            <feTurbulence\n            type='fractalNoise'\n            baseFrequency='2.31'\n            numOctaves='6'\n            stitchTiles='stitch'/>\n        </filter>\n        <rect width='100%' height='100%' fill=\"".concat(color, "\" filter='url(#noiseFilter)'/>\n    </svg>\n")));
+};
+var NoiseBackground = function (_a) {
+    var _b = _a.shade, shade = _b === void 0 ? 'medium' : _b;
+    return (React.createElement("div", { className: clsxm('h-full w-full absolute top-0 left-0', shade === 'light' && 'bg-white dark:bg-bg-900', shade === 'medium' && 'bg-bg-200 dark:bg-bg-950', shade === 'dark' && 'bg-bg-300 dark:bg-black') },
+        React.createElement("div", { className: clsxm("h-full w-full absolute top-0 left-0 opacity-40 dark:opacity-10"), style: { background: "url(data:image/svg+xml;base64,".concat(specks(), ")") } })));
+};
+
+var tags = {
+    h1: 'text-4xl sm:text-5xl font-semibold',
+    h2: 'text-3xl sm:text-4xl font-semibold',
+    h3: 'text-1xl sm:text-2xl font-semibold',
+    h4: 'text-lg sm:text-xl font-semibold',
+    h5: 'text-md sm:text-lg font-semibold',
+    h6: 'text-base font-semibold',
+    p: 'text-base',
+    pre: 'text-base font-sans',
+};
+var variants = {
+    default: 'text-fg-800 dark:text-fg-200',
+    primary: 'text-primary-800 dark:text-primary-200',
+    secondary: 'text-secondary-800 dark:text-secondary-200',
+    warning: 'text-warning-800 dark:text-warning-200',
+    danger: 'text-danger-800 dark:text-danger-200',
+    success: 'text-success-800 dark:text-success-200',
+};
+var H1 = function (_a) {
+    var _b = _a.className, className = _b === void 0 ? '' : _b, children = _a.children, _c = _a.color, color = _c === void 0 ? 'default' : _c, props = __rest(_a, ["className", "children", "color"]);
+    return (React.createElement("h1", __assign({ className: clsxm(tags.h1, variants[color], className) }, props), children));
+};
+var H2 = function (_a) {
+    var _b = _a.className, className = _b === void 0 ? '' : _b, children = _a.children, _c = _a.color, color = _c === void 0 ? 'default' : _c, props = __rest(_a, ["className", "children", "color"]);
+    return (React.createElement("h2", __assign({ className: clsxm(tags.h2, variants[color], className) }, props), children));
+};
+var H3 = function (_a) {
+    var _b = _a.className, className = _b === void 0 ? '' : _b, children = _a.children, _c = _a.color, color = _c === void 0 ? 'default' : _c, props = __rest(_a, ["className", "children", "color"]);
+    return (React.createElement("h3", __assign({ className: clsxm(tags.h3, variants[color], className) }, props), children));
+};
+var H4 = function (_a) {
+    var _b = _a.className, className = _b === void 0 ? '' : _b, children = _a.children, _c = _a.color, color = _c === void 0 ? 'default' : _c, props = __rest(_a, ["className", "children", "color"]);
+    return (React.createElement("h4", __assign({ className: clsxm(tags.h4, variants[color], className) }, props), children));
+};
+var H5 = function (_a) {
+    var _b = _a.className, className = _b === void 0 ? '' : _b, children = _a.children, _c = _a.color, color = _c === void 0 ? 'default' : _c, props = __rest(_a, ["className", "children", "color"]);
+    return (React.createElement("h5", __assign({ className: clsxm(tags.h5, variants[color], className) }, props), children));
+};
+var H6 = function (_a) {
+    var _b = _a.className, className = _b === void 0 ? '' : _b, children = _a.children, _c = _a.color, color = _c === void 0 ? 'default' : _c, props = __rest(_a, ["className", "children", "color"]);
+    return (React.createElement("h6", __assign({ className: clsxm(tags.h6, variants[color], className) }, props), children));
+};
+var P = function (_a) {
+    var _b = _a.className, className = _b === void 0 ? '' : _b, children = _a.children, _c = _a.color, color = _c === void 0 ? 'default' : _c, props = __rest(_a, ["className", "children", "color"]);
+    return (React.createElement("p", __assign({ className: clsxm(tags.p, variants[color], className) }, props), children));
+};
+var Pre = function (_a) {
+    var _b = _a.className, className = _b === void 0 ? '' : _b, children = _a.children, _c = _a.color, color = _c === void 0 ? 'default' : _c, props = __rest(_a, ["className", "children", "color"]);
+    return (React.createElement("pre", __assign({ className: clsxm(tags.pre, variants[color], className) }, props), children));
+};
+
 exports.Button = Button;
 exports.Error = Error$1;
+exports.H1 = H1;
+exports.H2 = H2;
+exports.H3 = H3;
+exports.H4 = H4;
+exports.H5 = H5;
+exports.H6 = H6;
 exports.Input = Input;
 exports.Label = Label;
+exports.Logo = Logo;
 exports.NoiseBackground = NoiseBackground;
+exports.P = P;
+exports.Pre = Pre;
 exports.clsxm = clsxm;
 exports.getTheme = getTheme;
 exports.safelist = safelist;

@@ -28,33 +28,33 @@ export type TextProps = {
 
 
 export const H1 = ({ className = '', children, color = 'default', ...props }: TextProps) => (
-    <h1 className={clsxm(tags.h1, className, variants[color])} {...props}>{children}</h1>
+    <h1 className={clsxm(tags.h1, variants[color], className)} {...props}>{children}</h1>
 )
 
 export const H2 = ({ className = '', children, color = 'default', ...props }: TextProps) => (
-    <h2 className={clsxm(tags.h2, className, variants[color])} {...props}>{children}</h2>
+    <h2 className={clsxm(tags.h2, variants[color], className)} {...props}>{children}</h2>
 )
 
 export const H3 = ({ className = '', children, color = 'default', ...props }: TextProps) => (
-    <h3 className={clsxm(tags.h3, className, variants[color])} {...props}>{children}</h3>
+    <h3 className={clsxm(tags.h3, variants[color], className)} {...props}>{children}</h3>
 )
 
 export const H4 = ({ className = '', children, color = 'default', ...props }: TextProps) => (
-    <h4 className={clsxm(tags.h4, className, variants[color])} {...props}>{children}</h4>
+    <h4 className={clsxm(tags.h4, variants[color], className)} {...props}>{children}</h4>
 )
 
 export const H5 = ({ className = '', children, color = 'default', ...props }: TextProps) => (
-    <h5 className={clsxm(tags.h5, className, variants[color])} {...props}>{children}</h5>
+    <h5 className={clsxm(tags.h5, variants[color], className)} {...props}>{children}</h5>
 )
 
 export const H6 = ({ className = '', children, color = 'default', ...props }: TextProps) => (
-    <h6 className={clsxm(tags.h6, className, variants[color])} {...props}>{children}</h6>
+    <h6 className={clsxm(tags.h6, variants[color], className)} {...props}>{children}</h6>
 )
 
 export const P = ({ className = '', children, color = 'default', ...props }: TextProps) => (
-    <p className={clsxm(tags.p, className, variants[color])} {...props}>{children}</p>
+    <p className={clsxm(tags.p, variants[color], className)} {...props}>{children}</p>
 )
 
 export const Pre = ({ className = '', children, color = 'default', ...props }: TextProps) => (
-    <pre className={clsxm(tags.pre, className, variants[color])} {...props}>{children}</pre>
+    <pre className={clsxm(tags.pre, variants[color], className)} {...props}>{children}</pre>
 )

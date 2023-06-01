@@ -1,8 +1,7 @@
 import { clsxm } from "@libraries/clsxm";
 import { DivProps } from "react-html-props";
 import { Member, useMembers } from "@stores/members";
-import { H3, P } from "@components/elements";
-import { Button } from "@components/elements/buttons";
+import { Button, H3, P } from "ui"
 import { Card } from "@components/elements/card";
 import { Buffer } from "buffer";
 import { Identity } from "@features/identity";
@@ -41,11 +40,11 @@ export const UnlockIdentity = ({ className = '' }: DivProps) => {
             Unlock Identity
           </H3>
           <P className="mt-2 mb-2 text-left">
-            Choose an identity to unlock. You will be prompted for your master password you used to create the identity. 
+            Choose an identity to unlock. You will be prompted for your master password you used to create the identity.
           </P>
           {members.map((member) => (
             <div key={`unlock-member-${member.nonce}`}>
-              <Button onClick={() => setUnlocking(member)} className="my-2" full>
+              <Button onClick={() => setUnlocking(member)} className="my-2" fullWidth>
                 {Buffer.from(member.name, 'base64').toString('utf-8')}
               </Button>
             </div>

@@ -1,4 +1,4 @@
-import { Button } from "@components/elements/buttons"
+import { Button } from "ui"
 import { ThemeSwitcher } from "@components/elements/theme-switcher"
 import { Main } from "@components/layout"
 
@@ -9,4 +9,4 @@ export const Import = () => {
       <Button>Import</Button>
     </Main>
   )
-} 
+}

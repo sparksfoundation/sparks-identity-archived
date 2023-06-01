@@ -16,12 +16,13 @@ export const Button = (props: ButtonExtendedProps) => {
     color = 'primary',
     disabled = false,
     fullWidth = false,
-    className = "", 
-    ...rest 
+    className = "",
+    ...rest
   } = props
 
   return (
     <button
+      type="button"
       className={clsxm(
         'text-slate-200',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
@@ -36,6 +37,7 @@ export const Button = (props: ButtonExtendedProps) => {
         color === 'success' && `bg-success-600 hover:bg-success-500 focus-visible:outline-success-600`,
         fullWidth && 'w-full',
         disabled && 'bg-disabled-400 hover:bg-disabled-400 cursor-default',
+        className
       )}
       {...rest}
     >

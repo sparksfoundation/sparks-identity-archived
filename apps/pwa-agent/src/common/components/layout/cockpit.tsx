@@ -8,7 +8,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { Cog6ToothIcon, HomeModernIcon, IdentificationIcon, PuzzlePieceIcon, TicketIcon } from "@heroicons/react/24/solid"
-import { H4, Logo, Noise } from "@components/elements"
+import { H4, Logo, NoiseBackground, } from "ui"
 import { ThemeSwitcher } from "@components/elements/theme-switcher"
 import { Link } from "react-router-dom";
 
@@ -80,7 +80,7 @@ export const CockPit = ({ children }: { children: ReactNode }) => {
                     {/* Sidebar component, swap this element with another sidebar if you like */}
                     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-slate-900 px-6 pb-4 ring-1 ring-slate-300/5">
                       <div className="flex h-16 shrink-0 items-center">
-                        <Logo /><H4 className="ml-2">SPARKS</H4>
+                        <Logo className="h-6 w-6" /><H4 className="ml-2">SPARKS</H4>
                       </div>
                       <nav className="flex flex-1 flex-col">
                         <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -126,9 +126,9 @@ export const CockPit = ({ children }: { children: ReactNode }) => {
           <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
             {/* Sidebar component, swap this element with another sidebar if you like */}
             <div className="flex grow flex-col gap-y-5 overflow-y-auto shadow-xl shadow-slate-950/50 dark:bg-slate-950 bg-slate-200 dark:text-slate-100 text-slate-950 px-6 pb-4">
-              <Noise />
+              <NoiseBackground />
               <div className="relative flex h-16 shrink-0 items-center">
-                <Logo /><H4 className="ml-2">SPARKS</H4>
+                <Logo className="h-6 w-6" /><H4 className="ml-2">SPARKS</H4>
               </div>
               <nav className="relative flex flex-1 flex-col">
                 <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -255,4 +255,4 @@ export const CockPit = ({ children }: { children: ReactNode }) => {
       </>
     </Main>
   )
-} 
+}

@@ -1,5 +1,4 @@
-import { H3, P } from "@components/elements";
-import { Button } from "@components/elements/buttons";
+import { Button, H3, P } from "ui"
 import { Card, CardProps } from "@components/elements/card";
 import { clsxm } from "@libraries/clsxm";
 import { z } from "zod";
@@ -49,8 +48,8 @@ export const ConfirmPassword = ({ error, className = '', onSubmit }: FormProps) 
           error={errors.confirm?.message}
         />
         <div className="flex justify-stretch gap-x-4">
-          <Button onClick={() => navigate('/')} warning full>Back</Button>
-          <Button type="submit" disabled={isSubmitting} full>Next</Button>
+          <Button onClick={() => navigate('/')} color="warning" fullWidth>Back</Button>
+          <Button type="submit" disabled={isSubmitting} fullWidth>Next</Button>
         </div>
       </form>
     </Card>

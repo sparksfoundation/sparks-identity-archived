@@ -1,4 +1,5 @@
-import { H1, P, Triangle } from "@components/elements"
+import { Triangle } from "@components/elements"
+import { H1, P } from 'ui'
 import { ThemeSwitcher } from "@components/elements/theme-switcher"
 import { Footer, Main } from "@components/layout"
 import { IntroCard } from "@features/landing-page"

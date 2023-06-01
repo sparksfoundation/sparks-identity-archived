@@ -1,16 +1,15 @@
-import { Button } from "@components/elements/buttons";
+import { Button, P } from "ui";
 import { CockPit } from "@components/layout/cockpit";
-// @ts-ignore 
+// @ts-ignore
 import DHT from '@hyperswarm/dht-relay';
-// @ts-ignore 
+// @ts-ignore
 import Stream from '@hyperswarm/dht-relay/ws';
-// @ts-ignore 
+// @ts-ignore
 import * as SDK from 'hyper-sdk';
 import { Buffer } from 'buffer'
 import util from "tweetnacl-util";
 import React, { ReactPropTypes } from "react";
 import { Card } from "@components/elements/card";
-import { P } from "@components/elements";
 
 interface IProps {}
 
@@ -27,10 +26,10 @@ export class Watch extends React.Component<IProps, IState>  {
             peers: [],
             sdk: null,
             waiting: false,
-        } as { 
+        } as {
             peers: any[],
             sdk: any,
-            waiting: boolean, 
+            waiting: boolean,
         };
         this.start = this.start.bind(this)
         this.stop = this.stop.bind(this)

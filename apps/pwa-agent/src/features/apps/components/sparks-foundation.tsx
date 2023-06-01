@@ -1,7 +1,6 @@
-import { H5, P } from "@components/elements"
 import { Card } from "@components/elements/card"
 import sparksfoundation from '../assets/covers/sparksfoundation.png'
-import { Button } from "@components/elements/buttons"
+import { Button, H5, P } from "ui"
 // @ts-ignore
 import { connect } from "@features/channels"
 import { useUser } from "@stores/user"
@@ -33,7 +32,7 @@ export const SparksFoundation = () => {
             <div className="bg-slate-100 p-4">
                 <H5 className="dark:text-slate-800 text-center mb-2">SPARKS Foundation</H5>
                 <P className="text-sm text-justify dark:text-slate-800 mb-4">Provides an example of personalized content experience based on your information, no login or server side data required.</P>
-                <Button onClick={launch} full disabled={connected}>
+                <Button onClick={launch} fullWidth disabled={connected}>
                     {connected ? 'connected' : 'launch'}
                 </Button>
             </div>
