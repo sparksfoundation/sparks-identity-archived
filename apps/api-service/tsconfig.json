@@ -10,7 +10,8 @@
       "outDir": "./dist",
       "types": [
         "@types/ws",
-        "@types/node"
+        "@types/node",
+        "fastify-websocket-server"
       ]
     }
   }
