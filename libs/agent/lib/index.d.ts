@@ -14,9 +14,16 @@ declare type KeyPairs = {
     encryption: KeyPair;
     signing: KeyPair;
 };
-declare type InceptionEvent = {};
-declare type RotationEvent = {};
-declare type DeletionEvent = {};
+declare type Event = {
+    eventIndex: string;
+    signatureThreshold: string;
+    witnessThreshold: string;
+    witnesses: string[];
+    configuration: object | object[] | string[];
+};
+declare type InceptionEvent = Event & {};
+declare type RotationEvent = Event & {};
+declare type DeletionEvent = Event & {};
 declare type KeyEvents = InceptionEvent | RotationEvent | DeletionEvent;
 declare type AttestationEvent = {};
 declare type RevocationEvent = {};
@@ -30,4 +37,4 @@ declare type PaymentRecievedEvent = {};
 declare type PaymentSettledEvent = {};
 declare type TransactionEvents = PaymentIssuedEvent | PaymentRecievedEvent | PaymentSettledEvent;
 
-export { AttestationEvent, CredentialEvents, DeletionEvent, DisclosureEvent, InceptionEvent, KeyEvents, KeyPair, KeyPairs, PaymentIssuedEvent, PaymentRecievedEvent, PaymentSettledEvent, PredicateEvent, PublicKeys, RevocationEvent, RotationEvent, SecretKeys, SelectiveDiscloureEvent, TransactionEvents, VerificationEvents };
+export { AttestationEvent, CredentialEvents, DeletionEvent, DisclosureEvent, Event, InceptionEvent, KeyEvents, KeyPair, KeyPairs, PaymentIssuedEvent, PaymentRecievedEvent, PaymentSettledEvent, PredicateEvent, PublicKeys, RevocationEvent, RotationEvent, SecretKeys, SelectiveDiscloureEvent, TransactionEvents, VerificationEvents };

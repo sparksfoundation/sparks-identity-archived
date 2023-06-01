@@ -1,7 +1,7 @@
 import nacl from "tweetnacl";
 import util from "tweetnacl-util";
 import { blake3 } from '@noble/hashes/blake3';
-import { nonceAndKeyPairFromPassword, randomKeyPair } from "./helpers.js";
+import { keyPairsFromPassword, randomSalt, signingKeysFromPassword } from "./forge.js";
 
 export type KeyPair = {
   publicKey: string;
@@ -23,9 +23,16 @@ export type KeyPairs = {
   signing: KeyPair,
 }
 
-export type InceptionEvent = {}
-export type RotationEvent = {}
-export type DeletionEvent = {}
+export type Event = {
+  eventIndex: string;
+  signatureThreshold: string;
+  witnessThreshold: string;
+  witnesses: string[];
+  configuration: object | object[] | string[];
+}
+export type InceptionEvent = Event & {}
+export type RotationEvent = Event & {}
+export type DeletionEvent = Event & {}
 export type KeyEvents = InceptionEvent | RotationEvent | DeletionEvent
 
 export type AttestationEvent = {}
@@ -77,7 +84,9 @@ class Identity {
 
   // the constructor only loads the identity but wont be 
   // functional until the identity is incepted or imported
-  constructor() { }
+  constructor({ keyPairs }: { keyPairs: KeyPairs }) {
+    this.#keyPairs = keyPairs
+  }
 
   private __init({
     identifier,
@@ -114,12 +123,15 @@ class Identity {
     }
   }
 
+  get keyIndex() {
+    return this.#keyEventLog.length
+  }
+
   // convenience helper to return null if not valid
-  private async __parseJSON(string) {
-    return new Promise((resolve, reject) => {
-      try { resolve(JSON.parse(string)) }
-      catch (e: any) { resolve(null) }
-    })
+  private __parseJSON(string) {
+    if (typeof string !== 'string') return null
+    try { return JSON.parse(string) }
+    catch (e: any) { return null }
   }
 
   private __randomKeyPairs(args?: { noise?: string | undefined }) {
@@ -147,13 +159,13 @@ class Identity {
     const isString = typeof data === 'string' || data as any instanceof String
     if (!isString) throw Error('can only import encrypted identity')
     const decrypted = await this.decrypt({ data })
-    const parsed = await this.__parseJSON(decrypted)
+    const parsed = this.__parseJSON(decrypted)
     if (parsed) return this.__init(parsed as InitArgs)
   }
 
   // exports all public info encrypted
   async export() {
-    const data = await this.__parseJSON(this)
+    const data = this.__parseJSON(this)
     if (!data) throw Error('error exporting')
     const encrypted = await this.encrypt({ data: data as InitArgs })
     if (!encrypted) throw Error('error exporting')
@@ -161,105 +173,93 @@ class Identity {
   }
 
   // generates inception event
-  incept({ noise = [], witness }: { noise?: string[], witness: string }) {
+  incept({ nextKey, witnesses }: { nextKey: string, witnesses?: string[] }) {
     // probably check of the inception event
     if (this.#identifier || this.#keyEventLog.length) {
       throw Error('Identity already incepted')
     }
 
-    if (!witness) {
+    if (!witnesses?.length) {
       throw Error('Witness public key required for inception')
     }
 
-    // generate a random key pair if none provided
-    const keyPairs = this.__randomKeyPairs({ noise: noise[0] })
-
     // https://identity.foundation/keri/kids/kid0001.html
-    const publicSigningKey = keyPairs.signing.publicKey
-    const identifier = `B${keyPairs.signing.publicKey.replace(/=$/, '')}`
+    const publicSigningKey = this.#keyPairs.signing.publicKey
+    const identifier = `B${this.#keyPairs.signing.publicKey.replace(/=$/, '')}`
+    const nextKeyHash = util.encodeBase64(blake3(util.decodeBase64(nextKey)))
 
-    const nextKeyPairs = this.__randomKeyPairs({ noise: noise[1] })
-    const nextSigningKey = util.encodeBase64(blake3(nextKeyPairs.signing.publicKey))
-    const nextEncryptionKey = util.encodeBase64(blake3(nextKeyPairs.encryption.publicKey))
-
-    // todo figure out how to generate the identifier
-    // I think we just hash the inception event maybe 
     const inceptionEvent = {
-      version: "",  // v: KERIvvSSSSSS_ KERI version SIZE _
       identifier: identifier,  // i: AID identifier prefix
       eventIndex: "0",  // s: sequence number
-      eventType: "inception",  // t: event type
+      eventType: "inception", // t: event type
       signatureThreshold: "1",  // kt: minimum amount of signatures needed for this event to be valid (multisig)
-      signingKey: publicSigningKey,  // k: list of signing keys
-      nextKeys: [ nextSigningKey, nextEncryptionKey ],  // n: next keys, added encryption because it makes sense imo
+      signingKey: [publicSigningKey],  // k: list of signing keys
+      nextKeys: [nextKeyHash],  // n: next keys, added encryption because it makes sense imo
       witnessThreshold: "1",  // wt: minimum amount of witnesses threshold
-      witnesses: [witness],  // w: list of witnesses in this case the spark pwa-agent host's publickey there's no receipt at this step
-      configuration: { // useful information maybe
-        hashAlgorithm: "Blake3-256",
-        keyCurves: { signing: "Ed25519", encryption: "Curve25519" },
-        nextKeyCurves: { signing: "Ed25519", encryption: "Curve25519" }
-      },
-    }
+      witnesses: [witnesses],  // w: list of witnesses in this case the spark pwa-agent host's publickey there's no receipt at this step
+      configuration: [] // c: explore if we need anything here
+    } as any // todo -- fix this type
 
-    const inceptionEventJSON = JSON.stringify(inceptionEvent)
-    const versionString = 'KERI10JSON' + inceptionEventJSON.length.toString(16).padStart(6, '0') + '_';
-    inceptionEvent.version = versionString;
+    // add the version and the SAID
+    const eventJSON = JSON.stringify(inceptionEvent)
+    const version = 'KERI10JSON' + eventJSON.length.toString(16).padStart(6, '0') + '_';
+    const hashedEvent = util.encodeBase64(blake3(eventJSON));
+    const signedEventHash = this.sign({ message: hashedEvent })
 
-    this.__init({
-      identifier,
-      keyPairs,
-      keyEventLog: [ inceptionEvent ], // this should be append and read only later, we can use offline hypercore 
-    })
+    // v: KERIvvSSSSSS_ KERI version SIZE _
+    inceptionEvent.version = version;
+    inceptionEvent.selfAddressingIdentifier = signedEventHash;
+
+    this.#identifier = identifier
+    this.#keyEventLog.push(inceptionEvent)
   }
 
   // rotate the keys
-  rotate(args?: { noise?: string, witnesses?: string[] }) {
-    const { noise, witnesses } = args || {};
-    
+  rotate({ keyPairs, nextKey, witnesses }: { keyPairs: KeyPairs, nextKey: string, witnesses?: string[] }) {
+    // probably check of the inception event
     if (!this.#identifier || !this.#keyEventLog.length) {
-      throw new Error('Identity not incepted yet')
+      throw Error('Identity not incepted yet')
     }
 
-    const nextKeyPairs = this.__randomKeyPairs({ noise })
-    const nextSigningKey = util.encodeBase64(blake3(nextKeyPairs.signing.publicKey))
-    const nextEncryptionKey = util.encodeBase64(blake3(nextKeyPairs.encryption.publicKey))
+    if (!witnesses?.length) {
+      throw Error('Witness public key required for inception')
+    }
+
+    const oldKeyEvent = this.#keyEventLog[this.#keyEventLog.length - 1]
+
+    this.#keyPairs = { ...keyPairs }
+
+    const publicSigningKey = this.#keyPairs.signing.publicKey
+    const nextKeyHash = util.encodeBase64(blake3(util.decodeBase64(nextKey)))
+
     const rotationEvent = {
-      version: "", // Placeholder for version string
       identifier: this.#identifier,
-      eventIndex: this.#keyEventLog.length.toString(), // Incremented event index
+      eventIndex: (parseInt(oldKeyEvent.eventIndex) + 1).toString(),
       eventType: "rotation",
-      signatureThreshold: "1", 
-      signingKeys: [this.#keyPairs.signing.publicKey],
-      nextKeys: [nextSigningKey, nextEncryptionKey],
-      witnessThreshold: "1", // minimum the witness threshold if needed
-      configuration: {
-        signingCurve: "Ed25519",
-        encryptionCurve: "Curve25519",
-        hashAlgorithm: "Blake3-256",
-        nextKeyCurves: ["Ed25519", "Curve25519"]
-      }
-    }
+      signatureThreshold: oldKeyEvent.signatureThreshold,
+      signingKey: [publicSigningKey],
+      nextKeys: [nextKeyHash],
+      witnessThreshold: oldKeyEvent.witnessThreshold,
+      witnesses: [...oldKeyEvent.witnesses],
+      configuration: Array.isArray(oldKeyEvent.configuration)
+        ? [...oldKeyEvent.configuration] 
+        : { ...oldKeyEvent.configuration }
+    } as any // todo -- fix this type
 
-    const rotationEventJSON = JSON.stringify(rotationEvent)
-    const versionString = `KERI10JSON${rotationEventJSON.length.toString(16).padStart(6, '0')}_`
-    rotationEvent.version = versionString
+    const eventJSON = JSON.stringify(rotationEvent)
+    const version = 'KERI10JSON' + eventJSON.length.toString(16).padStart(6, '0') + '_';
+    const hashedEvent = util.encodeBase64(blake3(eventJSON));
+    const signedEventHash = this.sign({ message: hashedEvent })
+
+    rotationEvent.version = version;
+    rotationEvent.selfAddressingIdentifier = signedEventHash;
+
+    console.log(rotationEvent)
 
     this.#keyEventLog.push(rotationEvent)
-
-    // we also need to request event receipts we can do that by queueing receipt requests
-    if (!witnesses) return
-    witnesses.forEach(witness => {
-      const receipt = {
-        eventIndex: rotationEvent.eventIndex,
-        witnesses: witnesses,
-        signatures: [],
-      }
-      this.#transportQueue.push(receipt)
-    })
   }
 
   destroy() {
-
   }
 
   encrypt({ data, publicKey, sharedKey }: { data: object | string, publicKey?: string, sharedKey?: string }): string {
@@ -270,7 +270,19 @@ class Identity {
     return ''
   }
 
-  sign({ message, detached }) { }
+  sign({ message, detached = false }: { message: object | string, detached?: boolean }) {
+    if (typeof message !== 'string' && !(message as any instanceof String)) {
+      message = this.__parseJSON(message)
+    }
+    const uintMessage = util.decodeUTF8(message as string);
+    const uintSecretKey = util.decodeBase64(this.#keyPairs.signing.secretKey);
+    const signature = detached
+      ? util.encodeBase64(nacl.sign.detached(uintMessage, uintSecretKey))
+      : util.encodeBase64(nacl.sign(uintMessage, uintSecretKey))
+
+    return signature
+  }
+
   verify({ message, signature, publicKey }) { }
   witness(event) { }
 
@@ -283,16 +295,24 @@ class Identity {
 }
 
 (async function test() {
-  // master keys -> this has nothing to do with your identity it's just to lock / unlock your data into storage
-  const { publicKey, secretKey, nonce } = await nonceAndKeyPairFromPassword({ password: 'asdfasdfasdf' })
 
-  // generate a random keypair to create a new identity
-  const keyPairs = randomKeyPair()
+  // create a new identity
+  const password = 'test'
+  const salt = randomSalt()
+  const keyPairs = await keyPairsFromPassword({ password, salt })
+  const identity = new Identity({ keyPairs })
 
-  // 
-  const identity = new Identity()
-  identity.incept({ noise: ['tes', 's'], witness: 'somekey' })
+  const nextKeyPairs = await keyPairsFromPassword({ password, salt: salt + identity.keyIndex })
+  const nextKey = nextKeyPairs.signing.publicKey
+  identity.incept({ nextKey, witnesses: ['sparks_server_public_key'] })
+  
   console.log(JSON.stringify(identity, null, 2))
-  identity.rotate()
+
+  // same as the previous step to replicate the "next keyPair"
+  const replaceWithkeyPairs = await keyPairsFromPassword({ password, salt: salt + identity.keyIndex })
+  const newNextKeyPair = await signingKeysFromPassword({ password, salt: salt + identity.keyIndex + 1 })
+  const newNextKey = newNextKeyPair.publicKey
+  await identity.rotate({ keyPairs: replaceWithkeyPairs, nextKey: newNextKey, witnesses: ['sparks_server_public_key'] })
+
   console.log(JSON.stringify(identity, null, 2))
 }())
