@@ -300,19 +300,42 @@ class Identity {
   let password, salt, keyPairs, nextKeyPairs, nextKey, identity;
 
   // incept a new identity with a password and salt to derive keyPairs
+  console.log('\n\nlets derive some keyPairs from a password and salt.')
+  console.log('we can use other methods like ephemeral keys, hardware')
+  console.log('wallet or even things like biometrics in the future')
+  console.log('----------------------------------------------------')
   password = 'test'
   salt = randomSalt()
   keyPairs = await keyPairsFromPassword({ password, salt })
   identity = new Identity({ keyPairs })
   nextKeyPairs = await keyPairsFromPassword({ password, salt: salt + identity.keyIndex })
   nextKey = nextKeyPairs.signing.publicKey
+  console.log('our public keys:')
+  console.log({ signing: keyPairs.signing.publicKey, encryption: keyPairs.encryption.publicKey }, '\n\n')
+
+  console.log('lets incept our identity with a nextKey and witnesses')
+  console.log('verifiers can choose to trust particular witnesses, or none at all')
+  console.log('this means no friction for casual peer networks and high security for others')
+  console.log('imagine a bank deduplicating and witnessing a subset of the network')
+  console.log('----------------------------------------------------')
   identity.incept({ nextKey, witnesses: ['sparks_server_public_key'] })
+  console.log('our identifier:', identity.identifier)
+  console.log('our public signing key:', identity.publicKeys.signing)
+  console.log('our public encryption key:', identity.publicKeys.encryption, '\n\n')
   //console.log(JSON.stringify(identity.debug(), null, 2))
   // let's rotate the keys
+  console.log('lets rotate our keys with a nextKey and witnesses')
+  console.log('imagine you want to upgrade to a more trusted witness')
+  console.log('or maybe your keys got compromised and you need to disable this identity')
+  console.log('you can rotate the keys without changing the identifier or losing history')
+  console.log('----------------------------------------------------')
   keyPairs = await keyPairsFromPassword({ password, salt: salt + (identity.keyIndex - 1) })
   nextKeyPairs = await keyPairsFromPassword({ password, salt: salt + identity.keyIndex })
   nextKey = nextKeyPairs.signing.publicKey
   await identity.rotate({ keyPairs, nextKey, witnesses: ['sparks_server_public_key'] })
+  console.log('our identifier is the same:', identity.identifier)
+  console.log('our new public signing key:', identity.publicKeys.signing)
+  console.log('our new public encryption key:', identity.publicKeys.encryption, '\n\n')
   //console.log(JSON.stringify(identity.debug(), null, 2))
 
   // let's change the password, this takes two rotations
@@ -321,6 +344,11 @@ class Identity {
   const newPassword = 'new password'
   const newSalt = randomSalt()
 
+  console.log('lets change our password, for whatever reason')
+  console.log('we need to rotate the keys twice to do this')
+  console.log('why? to maintain the chain of trust we have to honor the')
+  console.log('previous commitments to the nextKey which happened with the old password')
+  console.log('----------------------------------------------------')
   // first we must honor the nextKey with our old password and salt
   keyPairs = await keyPairsFromPassword({ password, salt: salt + (identity.keyIndex - 1) })
   nextKeyPairs = await keyPairsFromPassword({ password: newPassword, salt: newSalt + identity.keyIndex })
@@ -332,9 +360,19 @@ class Identity {
   nextKeyPairs = await keyPairsFromPassword({ password: newPassword, salt: newSalt + identity.keyIndex })
   nextKey = nextKeyPairs.signing.publicKey
   await identity.rotate({ keyPairs, nextKey, witnesses: ['sparks_server_public_key'] })
+  console.log('password updated!')
+  console.log('our identifier is the same:', identity.identifier)
+  console.log('our new public signing key:', identity.publicKeys.signing)
+  console.log('our new public encryption key:', identity.publicKeys.encryption, '\n\n')
 
   // let's verify the chain starting with event 0
   // we should have a helper for this as part of a Verifier extension class... Identity extends Verifier
+  console.log('let\'s verify out identities chain of events starting with event 0')
+  console.log('each event is signed by the previous event\'s nextKey')
+  console.log('and the event data is signed by the event\'s signing key')
+  console.log('this means we can verify the chain of events and the data integrity at every step')
+  console.log('we have the inception event, and three rotations to check')
+  console.log('----------------------------------------------------')
   const events = identity.debug().keyEventLog
   events.forEach((event, index) => {
     // what's happening here... it's checking that the event hasn't been tampered with
