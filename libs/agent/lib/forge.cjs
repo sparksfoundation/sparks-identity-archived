@@ -25,7 +25,12 @@ const keyPairsFromRandom = async () => {
 const signingKeysFromPassword = async ({ password, salt: noise }) => {
   const options = { N: 16384, r: 8, p: 1 };
   const salt = noise || _tweetnacl2.default.randomBytes(_tweetnacl2.default.secretbox.nonceLength);
-  const buffer = await scrypt.scrypt(password, salt, _tweetnacl2.default.box.secretKeyLength / 2, options);
+  const buffer = await scrypt.scrypt(
+    password,
+    salt,
+    _tweetnacl2.default.box.secretKeyLength / 2,
+    options
+  );
   const seed = [...new Uint8Array(buffer)].map((x) => x.toString(16).padStart(2, "0")).join("");
   const uint8Seed = _tweetnaclutil2.default.decodeUTF8(seed);
   const uint8Keypair = _tweetnacl2.default.sign.keyPair.fromSeed(uint8Seed);
@@ -37,7 +42,12 @@ const signingKeysFromPassword = async ({ password, salt: noise }) => {
 const encryptionKeysFromPassword = async ({ password, salt: noise }) => {
   const options = { N: 16384, r: 8, p: 1 };
   const salt = noise || _tweetnacl2.default.randomBytes(_tweetnacl2.default.secretbox.nonceLength);
-  const buffer = await scrypt.scrypt(password, salt, _tweetnacl2.default.box.secretKeyLength / 2, options);
+  const buffer = await scrypt.scrypt(
+    password,
+    salt,
+    _tweetnacl2.default.box.secretKeyLength / 2,
+    options
+  );
   const seed = [...new Uint8Array(buffer)].map((x) => x.toString(16).padStart(2, "0")).join("");
   const uint8Seed = _tweetnaclutil2.default.decodeUTF8(seed);
   const uint8Keypair = _tweetnacl2.default.box.keyPair.fromSecretKey(uint8Seed);

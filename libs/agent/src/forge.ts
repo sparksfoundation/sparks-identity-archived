@@ -1,7 +1,7 @@
 import * as scrypt from 'scrypt-pbkdf';
 import nacl from 'tweetnacl';
 import util from 'tweetnacl-util';
-import { KeyPairs } from '.';
+import { KeyPairs } from './types/keypairs.js';
 
 export const signingKeysFromRandom = async () => {
   const signing = nacl.sign.keyPair();
@@ -13,6 +13,7 @@ export const signingKeysFromRandom = async () => {
 
 export const encryptionKeysFromRandom = async () => {
   const encryption = nacl.box.keyPair();
+
   return {
     publicKey: util.encodeBase64(encryption.publicKey),
     secretKey: util.encodeBase64(encryption.secretKey),

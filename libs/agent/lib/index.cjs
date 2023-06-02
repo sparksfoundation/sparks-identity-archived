@@ -109,7 +109,11 @@ class Identity {
     _chunkWMBHDRFCcjs.__privateSet.call(void 0, this, _identifier, identifier);
     _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).push(inceptionEvent);
   }
-  rotate({ keyPairs, nextKey, witnesses }) {
+  rotate({
+    keyPairs,
+    nextKey,
+    witnesses
+  }) {
     if (!_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _identifier) || !_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).length) {
       throw Error("Identity not incepted yet");
     }
@@ -140,10 +144,18 @@ class Identity {
   }
   destroy() {
   }
-  encrypt({ data, publicKey, sharedKey }) {
+  encrypt({
+    data,
+    publicKey,
+    sharedKey
+  }) {
     return "";
   }
-  decrypt({ data, publicKey, sharedKey }) {
+  decrypt({
+    data,
+    publicKey,
+    sharedKey
+  }) {
     return "";
   }
   sign({ message, detached = false }) {
@@ -204,10 +216,15 @@ _connections = new WeakMap();
   nextKeyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password, salt: salt + identity.keyIndex });
   nextKey = nextKeyPairs.signing.publicKey;
   console.log("our public keys:");
-  console.log({ signing: keyPairs.signing.publicKey, encryption: keyPairs.encryption.publicKey }, "\n\n");
+  console.log(
+    { signing: keyPairs.signing.publicKey, encryption: keyPairs.encryption.publicKey },
+    "\n\n"
+  );
   console.log("lets incept our identity with a nextKey and witnesses");
   console.log("verifiers can choose to trust particular witnesses, or none at all");
-  console.log("this means no friction for casual peer networks and high security for others");
+  console.log(
+    "this means no friction for casual peer networks and high security for others"
+  );
   console.log("imagine a bank deduplicating and witnessing a subset of the network");
   console.log("----------------------------------------------------");
   identity.incept({ nextKey, witnesses: ["sparks_server_public_key"] });
@@ -217,9 +234,14 @@ _connections = new WeakMap();
   console.log("lets rotate our keys with a nextKey and witnesses");
   console.log("imagine you want to upgrade to a more trusted witness");
   console.log("or maybe your keys got compromised and you need to disable this identity");
-  console.log("you can rotate the keys without changing the identifier or losing history");
+  console.log(
+    "you can rotate the keys without changing the identifier or losing history"
+  );
   console.log("----------------------------------------------------");
-  keyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password, salt: salt + (identity.keyIndex - 1) });
+  keyPairs = await _forgejs.keyPairsFromPassword.call(void 0, {
+    password,
+    salt: salt + (identity.keyIndex - 1)
+  });
   nextKeyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password, salt: salt + identity.keyIndex });
   nextKey = nextKeyPairs.signing.publicKey;
   await identity.rotate({ keyPairs, nextKey, witnesses: ["sparks_server_public_key"] });
@@ -233,12 +255,24 @@ _connections = new WeakMap();
   console.log("why? to maintain the chain of trust we have to honor the");
   console.log("previous commitments to the nextKey which happened with the old password");
   console.log("----------------------------------------------------");
-  keyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password, salt: salt + (identity.keyIndex - 1) });
-  nextKeyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password: newPassword, salt: newSalt + identity.keyIndex });
+  keyPairs = await _forgejs.keyPairsFromPassword.call(void 0, {
+    password,
+    salt: salt + (identity.keyIndex - 1)
+  });
+  nextKeyPairs = await _forgejs.keyPairsFromPassword.call(void 0, {
+    password: newPassword,
+    salt: newSalt + identity.keyIndex
+  });
   nextKey = nextKeyPairs.signing.publicKey;
   await identity.rotate({ keyPairs, nextKey, witnesses: ["sparks_server_public_key"] });
-  keyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password: newPassword, salt: newSalt + (identity.keyIndex - 1) });
-  nextKeyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password: newPassword, salt: newSalt + identity.keyIndex });
+  keyPairs = await _forgejs.keyPairsFromPassword.call(void 0, {
+    password: newPassword,
+    salt: newSalt + (identity.keyIndex - 1)
+  });
+  nextKeyPairs = await _forgejs.keyPairsFromPassword.call(void 0, {
+    password: newPassword,
+    salt: newSalt + identity.keyIndex
+  });
   nextKey = nextKeyPairs.signing.publicKey;
   await identity.rotate({ keyPairs, nextKey, witnesses: ["sparks_server_public_key"] });
   console.log("password updated!");
@@ -248,18 +282,26 @@ _connections = new WeakMap();
   console.log("let's verify out identities chain of events starting with event 0");
   console.log("each event is signed by the previous event's nextKey");
   console.log("and the event data is signed by the event's signing key");
-  console.log("this means we can verify the chain of events and the data integrity at every step");
+  console.log(
+    "this means we can verify the chain of events and the data integrity at every step"
+  );
   console.log("we have the inception event, and three rotations to check");
   console.log("----------------------------------------------------");
   const events = identity.debug().keyEventLog;
   events.forEach((event, index) => {
     const { selfAddressingIdentifier, version, ...eventBody } = event;
     const message = _tweetnaclutil2.default.encodeBase64(_blake3.blake3.call(void 0, JSON.stringify(eventBody)));
-    const dataInTact = identity.verify({ message, signature: selfAddressingIdentifier, publicKey: event.signingKeys[0] });
+    const dataInTact = identity.verify({
+      message,
+      signature: selfAddressingIdentifier,
+      publicKey: event.signingKeys[0]
+    });
     console.log("event data trustworthy:", dataInTact);
     if (index > 0) {
       const keyCommittment = events[index - 1].nextKeys[0];
-      const currenKey = _tweetnaclutil2.default.encodeBase64(_blake3.blake3.call(void 0, _tweetnaclutil2.default.decodeBase64(event.signingKeys[0])));
+      const currenKey = _tweetnaclutil2.default.encodeBase64(
+        _blake3.blake3.call(void 0, _tweetnaclutil2.default.decodeBase64(event.signingKeys[0]))
+      );
       const committmentValid = currenKey === keyCommittment;
       console.log("key commitment in tact:", committmentValid);
     }

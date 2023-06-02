@@ -1,4 +1,4 @@
-import { KeyPairs } from './index.js';
+import { KeyPairs } from './types/keypairs.js';
 
 declare const signingKeysFromRandom: () => Promise<{
     publicKey: string;
