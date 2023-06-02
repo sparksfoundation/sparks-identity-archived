@@ -44,10 +44,6 @@ export const signingKeysFromPassword = async ({ password, salt: noise }) => {
     }
 }
 
-export const randomSalt = (len = 16) => {
-    return util.encodeBase64(nacl.randomBytes(len))
-}
-
 export const encryptionKeysFromPassword = async ({ password, salt: noise }) => {
     const options = { N: 16384, r: 8, p: 1 }
     const salt = noise || nacl.randomBytes(nacl.secretbox.nonceLength)
@@ -70,4 +66,8 @@ export const keyPairsFromPassword = async ({ password, salt }) => {
         signing: await signingKeysFromPassword({ password, salt }),
         encryption: await encryptionKeysFromPassword({ password, salt }),
     }
+}
+
+export const randomSalt = (len = 16) => {
+    return util.encodeBase64(nacl.randomBytes(len))
 }

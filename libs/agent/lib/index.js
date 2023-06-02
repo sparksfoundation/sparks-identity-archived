@@ -7,7 +7,7 @@ var _identifier, _keyPairs, _keyEventLog, _credentialEventLog, _verificationEven
 import nacl from "tweetnacl";
 import util from "tweetnacl-util";
 import { blake3 } from "@noble/hashes/blake3";
-import { keyPairsFromPassword, randomSalt, signingKeysFromPassword } from "./forge.js";
+import { keyPairsFromPassword, randomSalt } from "./forge.js";
 class Identity {
   constructor({ keyPairs }) {
     __privateAdd(this, _identifier, void 0);
@@ -62,24 +62,6 @@ class Identity {
       return null;
     }
   }
-  __randomKeyPairs(args) {
-    const seed = args?.noise ? blake3(args.noise) : null;
-    const uintKeyPairs = {
-      signing: seed ? nacl.sign.keyPair.fromSeed(seed) : nacl.sign.keyPair(),
-      encryption: seed ? nacl.box.keyPair.fromSecretKey(seed) : nacl.box.keyPair()
-    };
-    const keyPairs = {
-      encryption: {
-        publicKey: util.encodeBase64(uintKeyPairs.encryption.publicKey),
-        secretKey: util.encodeBase64(uintKeyPairs.encryption.secretKey)
-      },
-      signing: {
-        publicKey: util.encodeBase64(uintKeyPairs.encryption.publicKey),
-        secretKey: util.encodeBase64(uintKeyPairs.encryption.secretKey)
-      }
-    };
-    return keyPairs;
-  }
   async import({ data }) {
     const isString = typeof data === "string" || data instanceof String;
     if (!isString)
@@ -113,16 +95,15 @@ class Identity {
       eventIndex: "0",
       eventType: "inception",
       signatureThreshold: "1",
-      signingKey: [publicSigningKey],
+      signingKeys: [publicSigningKey],
       nextKeys: [nextKeyHash],
       witnessThreshold: "1",
-      witnesses: [witnesses],
-      configuration: []
+      witnesses: [witnesses]
     };
     const eventJSON = JSON.stringify(inceptionEvent);
     const version = "KERI10JSON" + eventJSON.length.toString(16).padStart(6, "0") + "_";
     const hashedEvent = util.encodeBase64(blake3(eventJSON));
-    const signedEventHash = this.sign({ message: hashedEvent });
+    const signedEventHash = this.sign({ message: hashedEvent, detached: true });
     inceptionEvent.version = version;
     inceptionEvent.selfAddressingIdentifier = signedEventHash;
     __privateSet(this, _identifier, identifier);
@@ -135,8 +116,8 @@ class Identity {
     if (!witnesses?.length) {
       throw Error("Witness public key required for inception");
     }
-    const oldKeyEvent = __privateGet(this, _keyEventLog)[__privateGet(this, _keyEventLog).length - 1];
     __privateSet(this, _keyPairs, { ...keyPairs });
+    const oldKeyEvent = __privateGet(this, _keyEventLog)[__privateGet(this, _keyEventLog).length - 1];
     const publicSigningKey = __privateGet(this, _keyPairs).signing.publicKey;
     const nextKeyHash = util.encodeBase64(blake3(util.decodeBase64(nextKey)));
     const rotationEvent = {
@@ -144,25 +125,22 @@ class Identity {
       eventIndex: (parseInt(oldKeyEvent.eventIndex) + 1).toString(),
       eventType: "rotation",
       signatureThreshold: oldKeyEvent.signatureThreshold,
-      signingKey: [publicSigningKey],
+      signingKeys: [publicSigningKey],
       nextKeys: [nextKeyHash],
       witnessThreshold: oldKeyEvent.witnessThreshold,
-      witnesses: [...oldKeyEvent.witnesses],
-      configuration: Array.isArray(oldKeyEvent.configuration) ? [...oldKeyEvent.configuration] : { ...oldKeyEvent.configuration }
+      witnesses: [...oldKeyEvent.witnesses]
     };
     const eventJSON = JSON.stringify(rotationEvent);
     const version = "KERI10JSON" + eventJSON.length.toString(16).padStart(6, "0") + "_";
     const hashedEvent = util.encodeBase64(blake3(eventJSON));
-    const signedEventHash = this.sign({ message: hashedEvent });
+    const signedEventHash = this.sign({ message: hashedEvent, detached: true });
     rotationEvent.version = version;
     rotationEvent.selfAddressingIdentifier = signedEventHash;
-    console.log(rotationEvent);
     __privateGet(this, _keyEventLog).push(rotationEvent);
   }
   destroy() {
   }
   encrypt({ data, publicKey, sharedKey }) {
-    console.log(__privateGet(this, _keyPairs));
     return "";
   }
   decrypt({ data, publicKey, sharedKey }) {
@@ -177,9 +155,26 @@ class Identity {
     const signature = detached ? util.encodeBase64(nacl.sign.detached(uintMessage, uintSecretKey)) : util.encodeBase64(nacl.sign(uintMessage, uintSecretKey));
     return signature;
   }
-  verify({ message, signature, publicKey }) {
+  verify({ publicKey, signature, message }) {
+    if (!!message) {
+      if (typeof message !== "string" && !message instanceof String) {
+        message = util.decodeUTF8(this.__parseJSON(message));
+      }
+      message = util.decodeUTF8(message);
+    }
+    const uintSignature = util.decodeBase64(signature);
+    const uintPublicKey = util.decodeBase64(publicKey);
+    return message ? nacl.sign.detached.verify(message, uintSignature, uintPublicKey) : nacl.sign.open(uintSignature, uintPublicKey);
   }
   witness(event) {
+  }
+  debug() {
+    return {
+      identifier: __privateGet(this, _identifier),
+      publicKey: this.publicKeys.signing,
+      nextKeys: __privateGet(this, _keyEventLog)[__privateGet(this, _keyEventLog).length - 1].nextKeys,
+      keyEventLog: __privateGet(this, _keyEventLog)
+    };
   }
   toJSON() {
     return {
@@ -197,17 +192,39 @@ _transactionEventLog = new WeakMap();
 _transportQueue = new WeakMap();
 _connections = new WeakMap();
 (async function test() {
-  const password = "test";
-  const salt = randomSalt();
-  const keyPairs = await keyPairsFromPassword({ password, salt });
-  const identity = new Identity({ keyPairs });
-  const nextKeyPairs = await keyPairsFromPassword({ password, salt: salt + identity.keyIndex });
-  const nextKey = nextKeyPairs.signing.publicKey;
+  let password, salt, keyPairs, nextKeyPairs, nextKey, identity;
+  password = "test";
+  salt = randomSalt();
+  keyPairs = await keyPairsFromPassword({ password, salt });
+  identity = new Identity({ keyPairs });
+  nextKeyPairs = await keyPairsFromPassword({ password, salt: salt + identity.keyIndex });
+  nextKey = nextKeyPairs.signing.publicKey;
   identity.incept({ nextKey, witnesses: ["sparks_server_public_key"] });
-  console.log(JSON.stringify(identity, null, 2));
-  const replaceWithkeyPairs = await keyPairsFromPassword({ password, salt: salt + identity.keyIndex });
-  const newNextKeyPair = await signingKeysFromPassword({ password, salt: salt + identity.keyIndex + 1 });
-  const newNextKey = newNextKeyPair.publicKey;
-  await identity.rotate({ keyPairs: replaceWithkeyPairs, nextKey: newNextKey, witnesses: ["sparks_server_public_key"] });
-  console.log(JSON.stringify(identity, null, 2));
+  keyPairs = await keyPairsFromPassword({ password, salt: salt + (identity.keyIndex - 1) });
+  nextKeyPairs = await keyPairsFromPassword({ password, salt: salt + identity.keyIndex });
+  nextKey = nextKeyPairs.signing.publicKey;
+  await identity.rotate({ keyPairs, nextKey, witnesses: ["sparks_server_public_key"] });
+  const newPassword = "new password";
+  const newSalt = randomSalt();
+  keyPairs = await keyPairsFromPassword({ password, salt: salt + (identity.keyIndex - 1) });
+  nextKeyPairs = await keyPairsFromPassword({ password: newPassword, salt: newSalt + identity.keyIndex });
+  nextKey = nextKeyPairs.signing.publicKey;
+  await identity.rotate({ keyPairs, nextKey, witnesses: ["sparks_server_public_key"] });
+  keyPairs = await keyPairsFromPassword({ password: newPassword, salt: newSalt + (identity.keyIndex - 1) });
+  nextKeyPairs = await keyPairsFromPassword({ password: newPassword, salt: newSalt + identity.keyIndex });
+  nextKey = nextKeyPairs.signing.publicKey;
+  await identity.rotate({ keyPairs, nextKey, witnesses: ["sparks_server_public_key"] });
+  const events = identity.debug().keyEventLog;
+  events.forEach((event, index) => {
+    const { selfAddressingIdentifier, version, ...eventBody } = event;
+    const message = util.encodeBase64(blake3(JSON.stringify(eventBody)));
+    const dataInTact = identity.verify({ message, signature: selfAddressingIdentifier, publicKey: event.signingKeys[0] });
+    console.log("event data trustworthy:", dataInTact);
+    if (index > 0) {
+      const keyCommittment = events[index - 1].nextKeys[0];
+      const currenKey = util.encodeBase64(blake3(util.decodeBase64(event.signingKeys[0])));
+      const committmentValid = currenKey === keyCommittment;
+      console.log("key commitment in tact:", committmentValid);
+    }
+  });
 })();

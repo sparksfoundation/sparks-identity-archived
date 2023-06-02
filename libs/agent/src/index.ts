@@ -28,6 +28,7 @@ export type Event = {
   signatureThreshold: string;
   witnessThreshold: string;
   witnesses: string[];
+  nextKeys?: string[];
   configuration: object | object[] | string[];
 }
 export type InceptionEvent = Event & {}
@@ -134,26 +135,6 @@ class Identity {
     catch (e: any) { return null }
   }
 
-  private __randomKeyPairs(args?: { noise?: string | undefined }) {
-    const seed = args?.noise ? blake3(args.noise) : null
-    const uintKeyPairs = {
-      signing: seed ? nacl.sign.keyPair.fromSeed(seed as Uint8Array) : nacl.sign.keyPair(),
-      encryption: seed ? nacl.box.keyPair.fromSecretKey(seed as Uint8Array) : nacl.box.keyPair()
-    }
-
-    const keyPairs = {
-      encryption: {
-        publicKey: util.encodeBase64(uintKeyPairs.encryption.publicKey),
-        secretKey: util.encodeBase64(uintKeyPairs.encryption.secretKey),
-      },
-      signing: {
-        publicKey: util.encodeBase64(uintKeyPairs.encryption.publicKey),
-        secretKey: util.encodeBase64(uintKeyPairs.encryption.secretKey),
-      }
-    }
-    return keyPairs
-  }
-
   // imports identity data from encrypted string
   async import({ data }: { data: string }) {
     const isString = typeof data === 'string' || data as any instanceof String
@@ -193,22 +174,23 @@ class Identity {
       eventIndex: "0",  // s: sequence number
       eventType: "inception", // t: event type
       signatureThreshold: "1",  // kt: minimum amount of signatures needed for this event to be valid (multisig)
-      signingKey: [publicSigningKey],  // k: list of signing keys
+      signingKeys: [publicSigningKey],  // k: list of signing keys
       nextKeys: [nextKeyHash],  // n: next keys, added encryption because it makes sense imo
-      witnessThreshold: "1",  // wt: minimum amount of witnesses threshold
+      witnessThreshold: "1",  // wt: minimum amount of witnesses threshold - I think these are called backers now
       witnesses: [witnesses],  // w: list of witnesses in this case the spark pwa-agent host's publickey there's no receipt at this step
-      configuration: [] // c: explore if we need anything here
     } as any // todo -- fix this type
 
     // add the version and the SAID
     const eventJSON = JSON.stringify(inceptionEvent)
     const version = 'KERI10JSON' + eventJSON.length.toString(16).padStart(6, '0') + '_';
     const hashedEvent = util.encodeBase64(blake3(eventJSON));
-    const signedEventHash = this.sign({ message: hashedEvent })
+    const signedEventHash = this.sign({ message: hashedEvent, detached: true })
 
     // v: KERIvvSSSSSS_ KERI version SIZE _
     inceptionEvent.version = version;
     inceptionEvent.selfAddressingIdentifier = signedEventHash;
+
+    // todo -- queue the receipt request
 
     this.#identifier = identifier
     this.#keyEventLog.push(inceptionEvent)
@@ -225,10 +207,8 @@ class Identity {
       throw Error('Witness public key required for inception')
     }
 
-    const oldKeyEvent = this.#keyEventLog[this.#keyEventLog.length - 1]
-
     this.#keyPairs = { ...keyPairs }
-
+    const oldKeyEvent = this.#keyEventLog[this.#keyEventLog.length - 1]
     const publicSigningKey = this.#keyPairs.signing.publicKey
     const nextKeyHash = util.encodeBase64(blake3(util.decodeBase64(nextKey)))
 
@@ -237,24 +217,21 @@ class Identity {
       eventIndex: (parseInt(oldKeyEvent.eventIndex) + 1).toString(),
       eventType: "rotation",
       signatureThreshold: oldKeyEvent.signatureThreshold,
-      signingKey: [publicSigningKey],
+      signingKeys: [publicSigningKey],
       nextKeys: [nextKeyHash],
       witnessThreshold: oldKeyEvent.witnessThreshold,
       witnesses: [...oldKeyEvent.witnesses],
-      configuration: Array.isArray(oldKeyEvent.configuration)
-        ? [...oldKeyEvent.configuration] 
-        : { ...oldKeyEvent.configuration }
     } as any // todo -- fix this type
 
     const eventJSON = JSON.stringify(rotationEvent)
     const version = 'KERI10JSON' + eventJSON.length.toString(16).padStart(6, '0') + '_';
     const hashedEvent = util.encodeBase64(blake3(eventJSON));
-    const signedEventHash = this.sign({ message: hashedEvent })
+    const signedEventHash = this.sign({ message: hashedEvent, detached: true })
 
     rotationEvent.version = version;
     rotationEvent.selfAddressingIdentifier = signedEventHash;
 
-    console.log(rotationEvent)
+    // todo queue witness receipt request
 
     this.#keyEventLog.push(rotationEvent)
   }
@@ -263,7 +240,6 @@ class Identity {
   }
 
   encrypt({ data, publicKey, sharedKey }: { data: object | string, publicKey?: string, sharedKey?: string }): string {
-    console.log(this.#keyPairs)
     return ''
   }
   decrypt({ data, publicKey, sharedKey }: { data: object | string, publicKey?: string, sharedKey?: string }): string {
@@ -283,8 +259,34 @@ class Identity {
     return signature
   }
 
-  verify({ message, signature, publicKey }) { }
+  verify({ publicKey, signature, message }) {
+    if (!!message) {
+      if (typeof message !== 'string' && !message as any instanceof String) {
+        message = util.decodeUTF8(this.__parseJSON(message))
+      }
+      message = util.decodeUTF8(message)
+    }
+    
+    const uintSignature = util.decodeBase64(signature)
+    const uintPublicKey = util.decodeBase64(publicKey)
+
+    return message 
+      ? nacl.sign.detached.verify(message, uintSignature, uintPublicKey)
+      : nacl.sign.open(uintSignature, uintPublicKey)
+  }
+
   witness(event) { }
+
+  // todo delete this eventually
+  debug() {
+    return {
+      identifier: this.#identifier,
+      //keyPairs: this.#keyPairs,
+      publicKey: this.publicKeys.signing,
+      nextKeys: this.#keyEventLog[this.#keyEventLog.length - 1].nextKeys,
+      keyEventLog: this.#keyEventLog,
+    }
+  }
 
   toJSON() {
     return {
@@ -295,24 +297,58 @@ class Identity {
 }
 
 (async function test() {
+  let password, salt, keyPairs, nextKeyPairs, nextKey, identity;
 
-  // create a new identity
-  const password = 'test'
-  const salt = randomSalt()
-  const keyPairs = await keyPairsFromPassword({ password, salt })
-  const identity = new Identity({ keyPairs })
-
-  const nextKeyPairs = await keyPairsFromPassword({ password, salt: salt + identity.keyIndex })
-  const nextKey = nextKeyPairs.signing.publicKey
+  // incept a new identity with a password and salt to derive keyPairs
+  password = 'test'
+  salt = randomSalt()
+  keyPairs = await keyPairsFromPassword({ password, salt })
+  identity = new Identity({ keyPairs })
+  nextKeyPairs = await keyPairsFromPassword({ password, salt: salt + identity.keyIndex })
+  nextKey = nextKeyPairs.signing.publicKey
   identity.incept({ nextKey, witnesses: ['sparks_server_public_key'] })
-  
-  console.log(JSON.stringify(identity, null, 2))
+  //console.log(JSON.stringify(identity.debug(), null, 2))
+  // let's rotate the keys
+  keyPairs = await keyPairsFromPassword({ password, salt: salt + (identity.keyIndex - 1) })
+  nextKeyPairs = await keyPairsFromPassword({ password, salt: salt + identity.keyIndex })
+  nextKey = nextKeyPairs.signing.publicKey
+  await identity.rotate({ keyPairs, nextKey, witnesses: ['sparks_server_public_key'] })
+  //console.log(JSON.stringify(identity.debug(), null, 2))
 
-  // same as the previous step to replicate the "next keyPair"
-  const replaceWithkeyPairs = await keyPairsFromPassword({ password, salt: salt + identity.keyIndex })
-  const newNextKeyPair = await signingKeysFromPassword({ password, salt: salt + identity.keyIndex + 1 })
-  const newNextKey = newNextKeyPair.publicKey
-  await identity.rotate({ keyPairs: replaceWithkeyPairs, nextKey: newNextKey, witnesses: ['sparks_server_public_key'] })
+  // let's change the password, this takes two rotations
+  // we need a new keyPair with our new password and salt
+  // the salt should use the index + 2 because that's where we're going in the event sequence
+  const newPassword = 'new password'
+  const newSalt = randomSalt()
 
-  console.log(JSON.stringify(identity, null, 2))
+  // first we must honor the nextKey with our old password and salt
+  keyPairs = await keyPairsFromPassword({ password, salt: salt + (identity.keyIndex - 1) })
+  nextKeyPairs = await keyPairsFromPassword({ password: newPassword, salt: newSalt + identity.keyIndex })
+  nextKey = nextKeyPairs.signing.publicKey
+  await identity.rotate({ keyPairs, nextKey, witnesses: ['sparks_server_public_key'] })
+
+  // then provide a new keyPair derived from our new password
+  keyPairs = await keyPairsFromPassword({ password: newPassword, salt: newSalt + (identity.keyIndex - 1) })
+  nextKeyPairs = await keyPairsFromPassword({ password: newPassword, salt: newSalt + identity.keyIndex })
+  nextKey = nextKeyPairs.signing.publicKey
+  await identity.rotate({ keyPairs, nextKey, witnesses: ['sparks_server_public_key'] })
+
+  // let's verify the chain starting with event 0
+  // we should have a helper for this as part of a Verifier extension class... Identity extends Verifier
+  const events = identity.debug().keyEventLog
+  events.forEach((event, index) => {
+    // what's happening here... it's checking that the event hasn't been tampered with
+    const { selfAddressingIdentifier, version, ...eventBody } = event
+    const message = util.encodeBase64(blake3(JSON.stringify(eventBody)))
+    const dataInTact = identity.verify({ message, signature: selfAddressingIdentifier, publicKey: event.signingKeys[0] })
+    console.log('event data trustworthy:', dataInTact)
+
+    // let's check that the current key is the same as the previous committed to using 
+    if (index > 0) {
+      const keyCommittment = events[index - 1].nextKeys[0]
+      const currenKey = util.encodeBase64(blake3(util.decodeBase64(event.signingKeys[0])))
+      const committmentValid = currenKey === keyCommittment
+      console.log('key commitment in tact:', committmentValid)
+    }
+  })
 }())

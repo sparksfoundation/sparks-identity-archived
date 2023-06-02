@@ -19,6 +19,7 @@ declare type Event = {
     signatureThreshold: string;
     witnessThreshold: string;
     witnesses: string[];
+    nextKeys?: string[];
     configuration: object | object[] | string[];
 };
 declare type InceptionEvent = Event & {};

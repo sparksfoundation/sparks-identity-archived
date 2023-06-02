@@ -34,9 +34,6 @@ const signingKeysFromPassword = async ({ password, salt: noise }) => {
     secretKey: _tweetnaclutil2.default.encodeBase64(uint8Keypair.secretKey)
   };
 };
-const randomSalt = (len = 16) => {
-  return _tweetnaclutil2.default.encodeBase64(_tweetnacl2.default.randomBytes(len));
-};
 const encryptionKeysFromPassword = async ({ password, salt: noise }) => {
   const options = { N: 16384, r: 8, p: 1 };
   const salt = noise || _tweetnacl2.default.randomBytes(_tweetnacl2.default.secretbox.nonceLength);
@@ -54,6 +51,9 @@ const keyPairsFromPassword = async ({ password, salt }) => {
     signing: await signingKeysFromPassword({ password, salt }),
     encryption: await encryptionKeysFromPassword({ password, salt })
   };
+};
+const randomSalt = (len = 16) => {
+  return _tweetnaclutil2.default.encodeBase64(_tweetnacl2.default.randomBytes(len));
 };
 
 

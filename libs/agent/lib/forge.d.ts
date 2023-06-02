@@ -16,7 +16,6 @@ declare const signingKeysFromPassword: ({ password, salt: noise }: {
     publicKey: string;
     secretKey: string;
 }>;
-declare const randomSalt: (len?: number) => string;
 declare const encryptionKeysFromPassword: ({ password, salt: noise }: {
     password: any;
     salt: any;
@@ -37,5 +36,6 @@ declare const keyPairsFromPassword: ({ password, salt }: {
         secretKey: string;
     };
 }>;
+declare const randomSalt: (len?: number) => string;
 
 export { encryptionKeysFromPassword, encryptionKeysFromRandom, keyPairsFromPassword, keyPairsFromRandom, randomSalt, signingKeysFromPassword, signingKeysFromRandom };

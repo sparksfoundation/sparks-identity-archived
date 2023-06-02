@@ -62,24 +62,6 @@ class Identity {
       return null;
     }
   }
-  __randomKeyPairs(args) {
-    const seed = _optionalChain([args, 'optionalAccess', _ => _.noise]) ? _blake3.blake3.call(void 0, args.noise) : null;
-    const uintKeyPairs = {
-      signing: seed ? _tweetnacl2.default.sign.keyPair.fromSeed(seed) : _tweetnacl2.default.sign.keyPair(),
-      encryption: seed ? _tweetnacl2.default.box.keyPair.fromSecretKey(seed) : _tweetnacl2.default.box.keyPair()
-    };
-    const keyPairs = {
-      encryption: {
-        publicKey: _tweetnaclutil2.default.encodeBase64(uintKeyPairs.encryption.publicKey),
-        secretKey: _tweetnaclutil2.default.encodeBase64(uintKeyPairs.encryption.secretKey)
-      },
-      signing: {
-        publicKey: _tweetnaclutil2.default.encodeBase64(uintKeyPairs.encryption.publicKey),
-        secretKey: _tweetnaclutil2.default.encodeBase64(uintKeyPairs.encryption.secretKey)
-      }
-    };
-    return keyPairs;
-  }
   async import({ data }) {
     const isString = typeof data === "string" || data instanceof String;
     if (!isString)
@@ -102,7 +84,7 @@ class Identity {
     if (_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _identifier) || _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).length) {
       throw Error("Identity already incepted");
     }
-    if (!_optionalChain([witnesses, 'optionalAccess', _2 => _2.length])) {
+    if (!_optionalChain([witnesses, 'optionalAccess', _ => _.length])) {
       throw Error("Witness public key required for inception");
     }
     const publicSigningKey = _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey;
@@ -113,16 +95,15 @@ class Identity {
       eventIndex: "0",
       eventType: "inception",
       signatureThreshold: "1",
-      signingKey: [publicSigningKey],
+      signingKeys: [publicSigningKey],
       nextKeys: [nextKeyHash],
       witnessThreshold: "1",
-      witnesses: [witnesses],
-      configuration: []
+      witnesses: [witnesses]
     };
     const eventJSON = JSON.stringify(inceptionEvent);
     const version = "KERI10JSON" + eventJSON.length.toString(16).padStart(6, "0") + "_";
     const hashedEvent = _tweetnaclutil2.default.encodeBase64(_blake3.blake3.call(void 0, eventJSON));
-    const signedEventHash = this.sign({ message: hashedEvent });
+    const signedEventHash = this.sign({ message: hashedEvent, detached: true });
     inceptionEvent.version = version;
     inceptionEvent.selfAddressingIdentifier = signedEventHash;
     _chunkWMBHDRFCcjs.__privateSet.call(void 0, this, _identifier, identifier);
@@ -132,11 +113,11 @@ class Identity {
     if (!_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _identifier) || !_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).length) {
       throw Error("Identity not incepted yet");
     }
-    if (!_optionalChain([witnesses, 'optionalAccess', _3 => _3.length])) {
+    if (!_optionalChain([witnesses, 'optionalAccess', _2 => _2.length])) {
       throw Error("Witness public key required for inception");
     }
-    const oldKeyEvent = _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog)[_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).length - 1];
     _chunkWMBHDRFCcjs.__privateSet.call(void 0, this, _keyPairs, { ...keyPairs });
+    const oldKeyEvent = _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog)[_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).length - 1];
     const publicSigningKey = _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey;
     const nextKeyHash = _tweetnaclutil2.default.encodeBase64(_blake3.blake3.call(void 0, _tweetnaclutil2.default.decodeBase64(nextKey)));
     const rotationEvent = {
@@ -144,25 +125,22 @@ class Identity {
       eventIndex: (parseInt(oldKeyEvent.eventIndex) + 1).toString(),
       eventType: "rotation",
       signatureThreshold: oldKeyEvent.signatureThreshold,
-      signingKey: [publicSigningKey],
+      signingKeys: [publicSigningKey],
       nextKeys: [nextKeyHash],
       witnessThreshold: oldKeyEvent.witnessThreshold,
-      witnesses: [...oldKeyEvent.witnesses],
-      configuration: Array.isArray(oldKeyEvent.configuration) ? [...oldKeyEvent.configuration] : { ...oldKeyEvent.configuration }
+      witnesses: [...oldKeyEvent.witnesses]
     };
     const eventJSON = JSON.stringify(rotationEvent);
     const version = "KERI10JSON" + eventJSON.length.toString(16).padStart(6, "0") + "_";
     const hashedEvent = _tweetnaclutil2.default.encodeBase64(_blake3.blake3.call(void 0, eventJSON));
-    const signedEventHash = this.sign({ message: hashedEvent });
+    const signedEventHash = this.sign({ message: hashedEvent, detached: true });
     rotationEvent.version = version;
     rotationEvent.selfAddressingIdentifier = signedEventHash;
-    console.log(rotationEvent);
     _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).push(rotationEvent);
   }
   destroy() {
   }
   encrypt({ data, publicKey, sharedKey }) {
-    console.log(_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs));
     return "";
   }
   decrypt({ data, publicKey, sharedKey }) {
@@ -177,9 +155,26 @@ class Identity {
     const signature = detached ? _tweetnaclutil2.default.encodeBase64(_tweetnacl2.default.sign.detached(uintMessage, uintSecretKey)) : _tweetnaclutil2.default.encodeBase64(_tweetnacl2.default.sign(uintMessage, uintSecretKey));
     return signature;
   }
-  verify({ message, signature, publicKey }) {
+  verify({ publicKey, signature, message }) {
+    if (!!message) {
+      if (typeof message !== "string" && !message instanceof String) {
+        message = _tweetnaclutil2.default.decodeUTF8(this.__parseJSON(message));
+      }
+      message = _tweetnaclutil2.default.decodeUTF8(message);
+    }
+    const uintSignature = _tweetnaclutil2.default.decodeBase64(signature);
+    const uintPublicKey = _tweetnaclutil2.default.decodeBase64(publicKey);
+    return message ? _tweetnacl2.default.sign.detached.verify(message, uintSignature, uintPublicKey) : _tweetnacl2.default.sign.open(uintSignature, uintPublicKey);
   }
   witness(event) {
+  }
+  debug() {
+    return {
+      identifier: _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _identifier),
+      publicKey: this.publicKeys.signing,
+      nextKeys: _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog)[_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).length - 1].nextKeys,
+      keyEventLog: _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog)
+    };
   }
   toJSON() {
     return {
@@ -197,17 +192,39 @@ _transactionEventLog = new WeakMap();
 _transportQueue = new WeakMap();
 _connections = new WeakMap();
 (async function test() {
-  const password = "test";
-  const salt = _forgejs.randomSalt.call(void 0, );
-  const keyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password, salt });
-  const identity = new Identity({ keyPairs });
-  const nextKeyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password, salt: salt + identity.keyIndex });
-  const nextKey = nextKeyPairs.signing.publicKey;
+  let password, salt, keyPairs, nextKeyPairs, nextKey, identity;
+  password = "test";
+  salt = _forgejs.randomSalt.call(void 0, );
+  keyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password, salt });
+  identity = new Identity({ keyPairs });
+  nextKeyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password, salt: salt + identity.keyIndex });
+  nextKey = nextKeyPairs.signing.publicKey;
   identity.incept({ nextKey, witnesses: ["sparks_server_public_key"] });
-  console.log(JSON.stringify(identity, null, 2));
-  const replaceWithkeyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password, salt: salt + identity.keyIndex });
-  const newNextKeyPair = await _forgejs.signingKeysFromPassword.call(void 0, { password, salt: salt + identity.keyIndex + 1 });
-  const newNextKey = newNextKeyPair.publicKey;
-  await identity.rotate({ keyPairs: replaceWithkeyPairs, nextKey: newNextKey, witnesses: ["sparks_server_public_key"] });
-  console.log(JSON.stringify(identity, null, 2));
+  keyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password, salt: salt + (identity.keyIndex - 1) });
+  nextKeyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password, salt: salt + identity.keyIndex });
+  nextKey = nextKeyPairs.signing.publicKey;
+  await identity.rotate({ keyPairs, nextKey, witnesses: ["sparks_server_public_key"] });
+  const newPassword = "new password";
+  const newSalt = _forgejs.randomSalt.call(void 0, );
+  keyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password, salt: salt + (identity.keyIndex - 1) });
+  nextKeyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password: newPassword, salt: newSalt + identity.keyIndex });
+  nextKey = nextKeyPairs.signing.publicKey;
+  await identity.rotate({ keyPairs, nextKey, witnesses: ["sparks_server_public_key"] });
+  keyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password: newPassword, salt: newSalt + (identity.keyIndex - 1) });
+  nextKeyPairs = await _forgejs.keyPairsFromPassword.call(void 0, { password: newPassword, salt: newSalt + identity.keyIndex });
+  nextKey = nextKeyPairs.signing.publicKey;
+  await identity.rotate({ keyPairs, nextKey, witnesses: ["sparks_server_public_key"] });
+  const events = identity.debug().keyEventLog;
+  events.forEach((event, index) => {
+    const { selfAddressingIdentifier, version, ...eventBody } = event;
+    const message = _tweetnaclutil2.default.encodeBase64(_blake3.blake3.call(void 0, JSON.stringify(eventBody)));
+    const dataInTact = identity.verify({ message, signature: selfAddressingIdentifier, publicKey: event.signingKeys[0] });
+    console.log("event data trustworthy:", dataInTact);
+    if (index > 0) {
+      const keyCommittment = events[index - 1].nextKeys[0];
+      const currenKey = _tweetnaclutil2.default.encodeBase64(_blake3.blake3.call(void 0, _tweetnaclutil2.default.decodeBase64(event.signingKeys[0])));
+      const committmentValid = currenKey === keyCommittment;
+      console.log("key commitment in tact:", committmentValid);
+    }
+  });
 })();
