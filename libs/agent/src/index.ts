@@ -8,6 +8,7 @@ import {
   VerificationEvents,
   TransactionEvents,
   KeyEvents,
+  RotationEvent,
 } from './types/events.js';
 
 // todo model receipts after any event
@@ -198,7 +199,7 @@ class Identity {
       nextKeys: [nextKeyHash],
       witnessThreshold: oldKeyEvent.witnessThreshold,
       witnesses: [...oldKeyEvent.witnesses],
-    } as any; // todo -- fix this type
+    } as RotationEvent;
 
     const eventJSON = JSON.stringify(rotationEvent);
     const version = 'KERI10JSON' + eventJSON.length.toString(16).padStart(6, '0') + '_';

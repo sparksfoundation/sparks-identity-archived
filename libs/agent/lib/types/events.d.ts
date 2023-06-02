@@ -10,7 +10,11 @@ declare type InceptionEvent = Event & {
     inceptionId: string;
 };
 declare type RotationEvent = Event & {
-    rotationId: string;
+    identifier: string;
+    eventType: string;
+    signingKeys: string[];
+    version: string;
+    selfAddressingIdentifier: string;
 };
 declare type DeletionEvent = Event & {
     deletionId: string;

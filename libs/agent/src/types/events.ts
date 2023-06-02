@@ -8,7 +8,14 @@ export type Event = {
 };
 
 export type InceptionEvent = Event & { inceptionId: string }; // the additional objects are examples of what some additional fields could be, still figuring this out
-export type RotationEvent = Event & { rotationId: string };
+export type RotationEvent = Event & {
+  identifier: string;
+  eventType: string;
+  signingKeys: string[];
+  version: string;
+  selfAddressingIdentifier: string;
+};
+
 export type DeletionEvent = Event & { deletionId: string };
 export type KeyEvents = InceptionEvent | RotationEvent | DeletionEvent;
 
