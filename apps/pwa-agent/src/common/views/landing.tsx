@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { Button, H1, P, Triangle } from 'ui'
-import { ThemeSwitcher } from "@components/elements/theme-switcher"
+import { ThemeSwitcher } from "@components/ThemeSwitcher"
 import { Footer, Main } from "@components/layout"
 import { IntroCard } from "@features/landing-page"
 

@@ -8,11 +8,11 @@ export const ThemeSwitcher = ({ className = '', fill = '' }: { className?: strin
     "cursor-pointer w-6 h-6",
     "text-slate-700 dark:text-slate-200",
   )
-  const Icon = theme === 'dark' ? SunIcon : MoonIcon;
   const nextTheme = theme === 'dark' ? Themes.light : Themes.dark;
   return (
     <button className={clsxm("absolute top-4 right-4 z-10 p-1 cursor-pointer", className)} onClick={() => setTheme(nextTheme)}>
-      <Icon className={clsxm(classes, fill)} />
+      <SunIcon className={clsxm(classes, fill, 'hidden dark:block')} />
+      <MoonIcon className={clsxm(classes, fill, 'block dark:hidden')} />
     </button>
   )
 }

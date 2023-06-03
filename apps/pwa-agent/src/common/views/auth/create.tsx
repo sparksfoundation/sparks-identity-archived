@@ -1,5 +1,5 @@
 import { Triangle } from "ui"
-import { ThemeSwitcher } from "@components/elements/theme-switcher"
+import { ThemeSwitcher } from "@components/ThemeSwitcher"
 import { Footer, Main } from "@components/layout"
 import { CreateIdentity } from "@features/create-page"
 

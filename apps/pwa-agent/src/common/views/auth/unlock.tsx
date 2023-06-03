@@ -1,5 +1,5 @@
 import { Triangle } from "ui"
-import { ThemeSwitcher } from "@components/elements/theme-switcher"
+import { ThemeSwitcher } from "@components/ThemeSwitcher"
 import { Main } from "@components/layout"
 import { UnlockIdentity } from "@features/unlock-page"
 

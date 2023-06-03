@@ -1,5 +1,5 @@
 import { Button } from "ui"
-import { ThemeSwitcher } from "@components/elements/theme-switcher"
+import { ThemeSwitcher } from "@components/ThemeSwitcher"
 import { Main } from "@components/layout"
 
 export const Import = () => {

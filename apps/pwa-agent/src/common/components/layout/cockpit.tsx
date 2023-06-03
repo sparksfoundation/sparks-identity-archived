@@ -9,7 +9,7 @@ import {
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { Cog6ToothIcon, HomeModernIcon, IdentificationIcon, PuzzlePieceIcon, TicketIcon } from "@heroicons/react/24/solid"
 import { H4, Logo, NoiseBackground, } from "ui"
-import { ThemeSwitcher } from "@components/elements/theme-switcher"
+import { ThemeSwitcher } from "@components/ThemeSwitcher"
 import { Link } from "react-router-dom";
 
 const navigation = [
@@ -194,7 +194,7 @@ export const CockPit = ({ children }: { children: ReactNode }) => {
                   />
                 </form>
                 <div className="flex items-center gap-x-4 lg:gap-x-6">
-                  <ThemeSwitcher className="relative top-auto left-auto " fill="dark:fill-slate-500 fill-slate-500" />
+                  <ThemeSwitcher className="relative top-auto left-auto" />
 
                   {/* Separator */}
                   <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-slate-900/10" aria-hidden="true" />
