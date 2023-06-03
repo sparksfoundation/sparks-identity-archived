@@ -9048,6 +9048,23 @@ var Button = function (props) {
     return (React.createElement("button", __assign({ type: "button", className: clsxm('text-slate-200', 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2', 'rounded cursor-pointer', size === 'sm' && 'px-2 py-1 text-sm', size === 'md' && 'px-2.5 py-1.5 text-base', size === 'lg' && 'px-4 py-3 text-base', color === 'primary' && "bg-primary-600 hover:bg-primary-500 focus-visible:outline-primary-600", color === 'secondary' && "bg-secondary-600 hover:bg-secondary-500 focus-visible:outline-secondary-600", color === 'warning' && "bg-warning-600 hover:bg-warning-500 focus-visible:outline-warning-600", color === 'danger' && "bg-danger-600 hover:bg-danger-500 focus-visible:outline-danger-600", color === 'success' && "bg-success-600 hover:bg-success-500 focus-visible:outline-success-600", fullWidth && 'w-full', disabled && 'bg-disabled-400 hover:bg-disabled-400 cursor-default', className) }, rest), children));
 };
 
+var specks = function (color) {
+    if (color === void 0) { color = "#000"; }
+    return (btoa("\n    <svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'>\n        <filter id='noiseFilter'>\n            <feTurbulence\n            type='fractalNoise'\n            baseFrequency='2.31'\n            numOctaves='6'\n            stitchTiles='stitch'/>\n        </filter>\n        <rect width='100%' height='100%' fill=\"".concat(color, "\" filter='url(#noiseFilter)'/>\n    </svg>\n")));
+};
+var NoiseBackground = function (_a) {
+    var _b = _a.shade, shade = _b === void 0 ? 'medium' : _b;
+    return (React.createElement("div", { className: clsxm('h-full w-full absolute top-0 left-0', shade === 'light' && 'bg-white dark:bg-bg-900', shade === 'medium' && 'bg-bg-200 dark:bg-bg-950', shade === 'dark' && 'bg-bg-300 dark:bg-black') },
+        React.createElement("div", { className: clsxm("h-full w-full absolute top-0 left-0 opacity-40 dark:opacity-10"), style: { background: "url(data:image/svg+xml;base64,".concat(specks(), ")") } })));
+};
+
+var Card = function (_a) {
+    var _b = _a.shade, shade = _b === void 0 ? 'medium' : _b, children = _a.children, _c = _a.className, className = _c === void 0 ? '' : _c, props = __rest(_a, ["shade", "children", "className"]);
+    return (React.createElement("div", __assign({ className: clsxm('card relative overflow-hidden p-6 backdrop-blur-2xs shadow-xl border rounded', 'shadow-bg-950/4 dark:shadow-bg-950/20 border-bg-950 dark:border-bg-50', shade === 'light' && 'border-opacity-4 dark:border-opacity-8', shade === 'medium' && 'border-opacity-6 dark:border-opacity-6', shade === 'dark' && 'border-opacity-10 dark:border-opacity-4', className) }, props),
+        React.createElement(NoiseBackground, { shade: shade }),
+        React.createElement("div", { className: "relative" }, children)));
+};
+
 var Logo = function (_a) {
     var _b = _a.size, size = _b === void 0 ? 'md' : _b, mode = _a.mode, _c = _a.className, className = _c === void 0 ? '' : _c;
     return (React.createElement("svg", { className: clsxm('inline-block', size === 'xs' && 'h-5 w-5', size === 'sm' && 'h-10 w-10', size === 'md' && 'h-20 w-20', size === 'lg' && 'h-40 w-40', size === 'xl' && 'h-80 w-80', className), fill: "none", viewBox: "0 0 100 100", xmlns: "http://www.w3.org/2000/svg" },
@@ -9068,16 +9085,6 @@ var Input = function (props) {
 var Label = function (_a) {
     var _b = _a.id, id = _b === void 0 ? '' : _b, children = _a.children, props = __rest(_a, ["id", "children"]);
     return (React.createElement("label", __assign({ htmlFor: id, className: clsxm("mb-2 text-md font-medium", "text-fg-700 dark:text-fg-200") }, props), children));
-};
-
-var specks = function (color) {
-    if (color === void 0) { color = "#000"; }
-    return (btoa("\n    <svg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'>\n        <filter id='noiseFilter'>\n            <feTurbulence\n            type='fractalNoise'\n            baseFrequency='2.31'\n            numOctaves='6'\n            stitchTiles='stitch'/>\n        </filter>\n        <rect width='100%' height='100%' fill=\"".concat(color, "\" filter='url(#noiseFilter)'/>\n    </svg>\n")));
-};
-var NoiseBackground = function (_a) {
-    var _b = _a.shade, shade = _b === void 0 ? 'medium' : _b;
-    return (React.createElement("div", { className: clsxm('h-full w-full absolute top-0 left-0', shade === 'light' && 'bg-white dark:bg-bg-900', shade === 'medium' && 'bg-bg-200 dark:bg-bg-950', shade === 'dark' && 'bg-bg-300 dark:bg-black') },
-        React.createElement("div", { className: clsxm("h-full w-full absolute top-0 left-0 opacity-40 dark:opacity-10"), style: { background: "url(data:image/svg+xml;base64,".concat(specks(), ")") } })));
 };
 
 var tags = {
@@ -9149,5 +9156,5 @@ var Triangle = function (_a) {
     return solid ? React.createElement(Solid, { className: className }) : React.createElement(Outline, { className: className });
 };
 
-export { Button, Error$1 as Error, H1, H2, H3, H4, H5, H6, Input, Label, Logo, NoiseBackground, P, Pre, Triangle, clsxm, getTheme, safelist };
+export { Button, Card, Error$1 as Error, H1, H2, H3, H4, H5, H6, Input, Label, Logo, NoiseBackground, P, Pre, Triangle, clsxm, getTheme, safelist };
 //# sourceMappingURL=index.esm.js.map

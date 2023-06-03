@@ -1,8 +1,7 @@
 import { clsxm } from "@libraries/clsxm";
 import { DivProps } from "react-html-props";
 import { Member, useMembers } from "@stores/members";
-import { Button, H3, P } from "ui"
-import { Card } from "@components/elements/card";
+import { Button, Card, H3, P } from "ui"
 import { Buffer } from "buffer";
 import { Identity } from "@features/identity";
 import { useState } from "react";
@@ -35,7 +34,7 @@ export const UnlockIdentity = ({ className = '' }: DivProps) => {
   return (
     <div className={clsxm("max-w-64", className)}>
       {!unlocking && (
-        <Card className={clsxm('w-full')}>
+        <Card>
           <H3 className={clsxm('mb-2 text-center')}>
             Unlock Identity
           </H3>

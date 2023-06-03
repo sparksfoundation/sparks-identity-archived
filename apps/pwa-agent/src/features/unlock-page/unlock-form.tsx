@@ -1,4 +1,3 @@
-import { Card, CardProps } from "@components/elements/card";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,7 +6,7 @@ import { FormEventHandler, useEffect } from "react";
 import { Input } from "@components/form";
 import { Member } from "@stores/members";
 import { clsxm } from "@libraries/clsxm";
-import { Button, H3, P } from "ui"
+import { Button, Card, H3, P } from "ui"
 import { Buffer } from "buffer";
 
 const formSchema = z.object({
@@ -22,8 +21,9 @@ type UnlockFormProps = {
   onSubmit: FormHandlerType;
   className?: string;
   identity: Member;
+  children?: React.ReactNode;
   error: string | undefined;
-} & CardProps
+}
 
 export const UnlockForm = ({ identity, error, className = '', onSubmit }: UnlockFormProps) => {
   const navigate = useNavigate();

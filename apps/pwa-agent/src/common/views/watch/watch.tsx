@@ -1,4 +1,4 @@
-import { Button, P } from "ui";
+import { Button, Card, P } from "ui";
 import { CockPit } from "@components/layout/cockpit";
 // @ts-ignore
 import DHT from '@hyperswarm/dht-relay';
@@ -9,7 +9,6 @@ import * as SDK from 'hyper-sdk';
 import { Buffer } from 'buffer'
 import util from "tweetnacl-util";
 import React, { ReactPropTypes } from "react";
-import { Card } from "@components/elements/card";
 
 interface IProps {}
 

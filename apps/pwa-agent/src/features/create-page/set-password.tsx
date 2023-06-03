@@ -1,5 +1,4 @@
-import { Button, H3, P } from "ui"
-import { Card, CardProps } from "@components/elements/card";
+import { Button, Card, H3, P } from "ui"
 import { clsxm } from "@libraries/clsxm";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -14,8 +13,9 @@ const formSchema = z.object({
 
 export type FormSchemaType = z.infer<typeof formSchema>;
 export type FormHandlerType = FormEventHandler<HTMLDivElement> & SubmitHandler<FormSchemaType>
+export type SetPasswordProps = { className?: string, onSubmit: SubmitHandler<FormSchemaType> }
 
-export const SetPassword = ({ className = '', onSubmit }: CardProps & { onSubmit: SubmitHandler<FormSchemaType> }) => {
+export const SetPassword = ({ className = '', onSubmit }: SetPasswordProps) => {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors, isSubmitting } } =
     useForm<FormSchemaType>({ resolver: zodResolver(formSchema) });

@@ -1,6 +1,5 @@
-import { Card } from "@components/elements/card"
 import sparksfoundation from '../assets/covers/sparksfoundation.png'
-import { Button, H5, P } from "ui"
+import { Button, Card, H5, P } from "ui"
 // @ts-ignore
 import { connect } from "@features/channels"
 import { useUser } from "@stores/user"

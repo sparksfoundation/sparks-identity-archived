@@ -1,11 +1,10 @@
-import { Button, H3, P } from "ui"
-import { Card, CardProps } from "@components/elements/card";
+import { Button, Card, H3, P } from "ui"
 import { clsxm } from "@libraries/clsxm";
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import { FormEventHandler } from "react";
+import { FormEventHandler, ReactNode } from "react";
 import { Input } from "@components/form";
 
 const formSchema = z.object({
@@ -14,8 +13,9 @@ const formSchema = z.object({
 
 export type FormSchemaType = z.infer<typeof formSchema>;
 export type FormHandlerType = FormEventHandler<HTMLDivElement> & SubmitHandler<FormSchemaType>
+export type SetNameProps = { className?: string, onSubmit: SubmitHandler<FormSchemaType> }
 
-export const SetName = ({ className = '', onSubmit }: CardProps & { onSubmit: SubmitHandler<FormSchemaType> }) => {
+export const SetName = ({ className = '', onSubmit }: SetNameProps) => {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors, isSubmitting } } =
     useForm<FormSchemaType>({ resolver: zodResolver(formSchema) });

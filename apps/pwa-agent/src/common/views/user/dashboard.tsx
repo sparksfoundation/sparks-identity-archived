@@ -1,4 +1,4 @@
-import { Card } from "@components/elements/card";
+import { Card } from "ui";
 import { CockPit } from "@components/layout/cockpit";
 
 

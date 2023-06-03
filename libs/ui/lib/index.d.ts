@@ -1,6 +1,7 @@
 /// <reference types="react" />
 import { ClassValue } from 'clsx';
-import { ButtonProps, SVGProps, DivProps, InputProps, LabelProps, H1Props, H2Props, H3Props, H4Props, H5Props, H6Props, PreProps } from 'react-html-props';
+import { ButtonProps, DivProps, SVGProps, InputProps, LabelProps, H1Props, H2Props, H3Props, H4Props, H5Props, H6Props, PreProps } from 'react-html-props';
+import { ReactNode } from 'react';
 import { UseFormRegisterReturn } from 'react-hook-form';
 
 declare const clsxm: (...classes: ClassValue[]) => string;
@@ -84,6 +85,13 @@ type ButtonExtendedProps = {
 } & ButtonProps;
 declare const Button: (props: ButtonExtendedProps) => JSX.Element;
 
+type CardProps = {
+    children: ReactNode;
+    shade?: 'light' | 'medium' | 'dark';
+    className?: string;
+} & DivProps;
+declare const Card: ({ shade, children, className, ...props }: CardProps) => JSX.Element;
+
 type SVGExtendedProps = {
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
     mode?: 'dark' | 'light';
@@ -133,4 +141,4 @@ type TriangleProps = {
 } & DivProps;
 declare const Triangle: ({ className, solid }: TriangleProps) => JSX.Element;
 
-export { Button, Error, H1, H2, H3, H4, H5, H6, Input, Label, Logo, NoiseBackground, P, Pre, SVGExtendedProps, TextProps, Triangle, clsxm, getTheme, safelist };
+export { Button, Card, CardProps, Error, H1, H2, H3, H4, H5, H6, Input, Label, Logo, NoiseBackground, P, Pre, SVGExtendedProps, TextProps, Triangle, clsxm, getTheme, safelist };

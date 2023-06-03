@@ -1,12 +1,12 @@
-import { H3, P } from "ui";
-import { Card, CardProps } from "@components/elements/card";
+import { Card, H3, P } from "ui";
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { clsxm } from "@libraries/clsxm";
 import { ReactNode } from "react";
 
-export type IntroCardProps = CardProps & {
+export type IntroCardProps = {
   footer?: ReactNode,
   title: string,
+  className?: string,
   description: string,
   items: string[],
   highlighted?: boolean,
