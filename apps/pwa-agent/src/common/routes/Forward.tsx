@@ -18,7 +18,6 @@ export const Forward = ({ usersTo, membersTo, guestsTo, Component }: ForwardProp
   const redirectMember = !!membersTo && hasMembers && !matchPath(membersTo, location.pathname)
   const redirectGuest = !!guestsTo && !(user || hasMembers) && !matchPath(guestsTo, location.pathname)
 
-  console.log({ redirectUser, redirectMember, redirectGuest, usersTo, membersTo, guestsTo, location, user, members })
   if (redirectUser) return <Navigate to={usersTo} />
   else if (redirectMember) return <Navigate to={membersTo} />
   else if (redirectGuest) return <Navigate to={guestsTo} />

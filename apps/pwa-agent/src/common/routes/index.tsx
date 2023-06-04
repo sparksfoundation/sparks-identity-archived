@@ -1,15 +1,16 @@
 import { useRoutes } from 'react-router-dom';
 import { useMembers } from '@stores/members';
 import { useTheme } from '@stores/theme';
-import { Landing } from '@views';
 import { LoadStores } from './LoadStorage';
 import { LoadTheme } from './LoadTheme';
 import { Forward } from './Forward';
-import { Dashboard, Profile, Settings } from '@views/user';
-import { Apps } from '@views/apps';
-import { Watch } from '@views/watch';
-import { Create, Import, Unlock } from '@views/auth';
-import { PublicLayout, PrivateLayout } from '@components/layout';
+import { PublicLayout, PrivateLayout } from '@layout';
+
+import { Landing } from '@pages';
+import { Create, Import, Unlock } from '@pages/auth';
+import { Apps } from '@pages/user/apps';
+import { Dashboard } from '@pages/user';
+import { Worker } from '@pages/user/worker';
 
 const routes = [
   {
@@ -29,16 +30,10 @@ const routes = [
           {
             element: <PrivateLayout />, children: [
               { path: '/user', element: <Dashboard /> },
-              { path: '/user/profile', element: <Profile /> },
-              { path: '/user/credentials', element: <Landing /> },
-              { path: '/user/credentials/:id', element: <Landing /> },
               { path: '/user/apps', element: <Apps /> },
               { path: '/user/apps/:id', element: <Landing /> },
               { path: '/user/dashboard', element: <Landing /> },
-              { path: '/user/settings', element: <Settings /> },
-              { path: '/user/settings/profile', element: <Settings /> },
-              { path: '/user/settings/security', element: <Settings /> },
-              { path: '/user/worker', element: <Watch /> },
+              { path: '/user/worker', element: <Worker /> },
             ]
           }
         ]

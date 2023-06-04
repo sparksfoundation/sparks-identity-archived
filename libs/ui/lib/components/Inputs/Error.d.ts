@@ -1,7 +1,8 @@
 /// <reference types="react" />
 import { DivProps } from "react-html-props";
 type ErrorExtendedProps = {
-    children: string;
+    children?: string;
+    className?: string;
 } & DivProps;
-export declare const Error: ({ children, ...props }: ErrorExtendedProps) => JSX.Element;
+export declare const Error: ({ children, className, ...props }: ErrorExtendedProps) => JSX.Element;
 export {};

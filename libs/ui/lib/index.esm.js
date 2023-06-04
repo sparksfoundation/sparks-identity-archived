@@ -9081,19 +9081,18 @@ var Logo = function (_a) {
 };
 
 var Error$1 = function (_a) {
-    var children = _a.children; __rest(_a, ["children"]);
-    return (React.createElement("div", { className: clsxm("text-red-700 font-bold text-xs block mt-2", children ? "visible" : "invisible") }, children));
+    var children = _a.children, _b = _a.className, className = _b === void 0 ? '' : _b, props = __rest(_a, ["children", "className"]);
+    return (React.createElement("div", __assign({ className: clsxm("text-red-700 font-bold text-xs block mt-2 w-full", children ? "visible" : "invisible", className) }, props), children));
 };
 
 var Input = function (props) {
-    var _a = props.type, type = _a === void 0 ? 'text' : _a, registration = props.registration;
-    return (React.createElement("div", null,
-        React.createElement("input", __assign({ type: type, className: clsxm("block rounded px-2.5 py-1.5 text-md shadow-none bg-bg-50", "text-fg-800 placeholder:text-fg-200", "ring-0 focus:ring-0 outline-none focus:outline-none border-0", "ring-1 ring-fg-300 focus:ring-primary-500 focus:ring-2", "invalid:ring-red-700 invalid:focus:ring-red-700", "disabled:ring-fg-300 disabled:focus:ring-fg-300 disabled:ring-1", "disabled:bg-bg-100 disabled:cursor-default") }, registration, props))));
+    var _a = props.type, type = _a === void 0 ? 'text' : _a, registration = props.registration, _b = props.className, className = _b === void 0 ? '' : _b;
+    return (React.createElement("input", __assign({ type: type, className: clsxm("w-full m-0 block rounded px-2.5 py-1.5 text-md shadow-none bg-bg-50", "text-fg-800 placeholder:text-fg-300", "ring-0 focus:ring-0 outline-none focus:outline-none border-0", "ring-1 ring-fg-300 focus:ring-primary-500 focus:ring-2", "invalid:ring-red-700 invalid:focus:ring-red-700", "disabled:ring-fg-300 disabled:focus:ring-fg-300 disabled:ring-1", "disabled:bg-bg-100 disabled:cursor-default", className) }, registration, props)));
 };
 
 var Label = function (_a) {
-    var _b = _a.id, id = _b === void 0 ? '' : _b, children = _a.children, props = __rest(_a, ["id", "children"]);
-    return (React.createElement("label", __assign({ htmlFor: id, className: clsxm("mb-2 text-md font-medium", "text-fg-700 dark:text-fg-200") }, props), children));
+    var _b = _a.id, id = _b === void 0 ? '' : _b, children = _a.children, _c = _a.className, className = _c === void 0 ? '' : _c, props = __rest(_a, ["id", "children", "className"]);
+    return (React.createElement("label", __assign({ htmlFor: id, className: clsxm("w-full mb-2 text-md font-medium", "text-fg-700 dark:text-fg-200", className) }, props), children));
 };
 
 var tags = {

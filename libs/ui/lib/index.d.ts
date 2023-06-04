@@ -112,25 +112,28 @@ type SVGExtendedProps = {
 declare const Logo: ({ size, mode, className }: SVGExtendedProps) => JSX.Element;
 
 type ErrorExtendedProps = {
-    children: string;
+    children?: string;
+    className?: string;
 } & DivProps;
-declare const Error: ({ children, ...props }: ErrorExtendedProps) => JSX.Element;
+declare const Error: ({ children, className, ...props }: ErrorExtendedProps) => JSX.Element;
 
 type InputExtendedProps = {
     type?: 'text' | 'email' | 'password' | 'hidden';
     placeholder?: string;
-    registration: Partial<UseFormRegisterReturn>;
-    fullWidth: boolean;
+    registration?: Partial<UseFormRegisterReturn>;
+    fullWidth?: boolean;
     pattern?: string;
-    disabled: boolean;
+    disabled?: boolean;
+    className?: string;
 } & InputProps;
 declare const Input: (props: InputExtendedProps) => JSX.Element;
 
 type LabelExtendedProps = {
     id?: string;
     children: string;
+    className?: string;
 } & LabelProps;
-declare const Label: ({ id, children, ...props }: LabelExtendedProps) => JSX.Element;
+declare const Label: ({ id, children, className, ...props }: LabelExtendedProps) => JSX.Element;
 
 type NoiseBackgroundProps = {
     shade?: 'light' | 'medium' | 'dark';
