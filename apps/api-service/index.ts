@@ -1,15 +1,12 @@
 const fastify = require('fastify')
-const { initRelay } = require('./src/swarm-relay')
+const swarmRelay = require('./src/swarm-relay')
 
 const server = fastify()
 
-server.register(require('fastify-websocket-server')).after((error: Error) => {
-    if (error) throw error
-    server.wss.on('connection', initRelay)
-})
+server.register(swarmRelay)
 
-server.get('/', async () => {
-    return 'hello world\n'
+server.get('/ping', async () => {
+    return 'pong\n'
 })
 
 server.listen({ port: process.env.PORT || 3400 }, (err: any, address: any) => {

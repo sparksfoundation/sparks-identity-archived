@@ -8,20 +8,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-// Require the framework and instantiate it
-const fastify = require('fastify')({ logger: true });
-// Declare a route
-fastify.get('/', () => __awaiter(void 0, void 0, void 0, function* () {
-    return { hello: 'world' };
+const fastify = require('fastify');
+const { initRelay } = require('./src/swarm-relay');
+const server = fastify();
+server.register(require('fastify-websocket-server')).after((error) => {
+    if (error)
+        throw error;
+    server.wss.on('connection', initRelay);
+});
+server.get('/', () => __awaiter(void 0, void 0, void 0, function* () {
+    return 'hello world\n';
 }));
-// Run the server!
-const start = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield fastify.listen({ port: 3000 });
-    }
-    catch (err) {
-        fastify.log.error(err);
+server.listen({ port: process.env.PORT || 3400 }, (err, address) => {
+    if (err) {
+        console.error(err);
         process.exit(1);
     }
+    console.log(`Server listening at ${address}`);
 });
-start();
