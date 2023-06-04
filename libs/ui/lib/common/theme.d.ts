@@ -3,6 +3,19 @@ export declare function getTheme({ defaultTheme, defaultColors }: {
     defaultColors: any;
 }): {
     extend: {
+        animation: {
+            'fade-in': string;
+        };
+        keyframes: {
+            fadeIn: {
+                '0%': {
+                    opacity: string;
+                };
+                '100%': {
+                    opacity: string;
+                };
+            };
+        };
         fontFamily: {
             sans: any[];
         };

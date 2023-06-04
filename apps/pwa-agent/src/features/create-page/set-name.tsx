@@ -4,7 +4,7 @@ import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import { FormEventHandler, ReactNode } from "react";
+import { FormEventHandler } from "react";
 import { Input } from "@components/form";
 
 const formSchema = z.object({
@@ -38,7 +38,7 @@ export const SetName = ({ className = '', onSubmit }: SetNameProps) => {
           error={errors.name?.message}
         />
         <div className="flex justify-stretch gap-x-4">
-          <Button onClick={() => navigate('/')} color="warning" fullWidth>Cancel</Button>
+          <Button onClick={() => navigate('')} color="warning" fullWidth>Cancel</Button>
           <Button type="submit" disabled={isSubmitting} fullWidth>Next</Button>
         </div>
       </form>

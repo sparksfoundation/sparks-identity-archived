@@ -1,14 +1,12 @@
 import { useNavigate } from "react-router-dom"
 import { Button, H1, P, Triangle } from 'ui'
 import { ThemeSwitcher } from "@components/ThemeSwitcher"
-import { Footer, Main } from "@components/layout"
 import { IntroCard } from "@features/landing-page"
 
 export const Landing = () => {
   const navigate = useNavigate()
-
   return (
-    <Main>
+    <>
       <ThemeSwitcher className="absolute top-4 right-4" />
       <Triangle className="left-1/2 top-0 -translate-x-1/2 -translate-y-1/2" />
       <Triangle className="left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2" />
@@ -28,7 +26,7 @@ export const Landing = () => {
             title="Get Started Now"
             description="Getting started is easy! Click below to follow setup steps."
             items={['Name your identity', 'Provide a password', 'Add your credentials', 'Reclaim your identity!']}
-            footer={<Button fullWidth onClick={() => navigate('/auth')}>Create</Button>}
+            footer={<Button fullWidth onClick={() => navigate('/auth/create')}>Create</Button>}
           />
           <IntroCard
             className="hidden 800:block"
@@ -38,7 +36,6 @@ export const Landing = () => {
           />
         </div>
       </div>
-      <Footer />
-    </Main>
+    </>
   )
 }

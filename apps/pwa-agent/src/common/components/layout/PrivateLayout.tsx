@@ -1,6 +1,5 @@
-import { Main } from "@components/layout"
 import { useUser } from "@stores/user"
-import { Fragment, ReactNode, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Dialog, Menu, Transition } from '@headlessui/react'
 import {
   Bars3Icon,
@@ -10,13 +9,13 @@ import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { Cog6ToothIcon, HomeModernIcon, IdentificationIcon, PuzzlePieceIcon, TicketIcon } from "@heroicons/react/24/solid"
 import { H4, Logo, NoiseBackground, } from "ui"
 import { ThemeSwitcher } from "@components/ThemeSwitcher"
-import { Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
 const navigation = [
-  { name: 'Dashboard', href: '/user/dashboard', icon: HomeModernIcon, current: true },
+  { name: 'Dashboard', href: '/user', icon: HomeModernIcon, current: true },
   { name: 'Credentials', href: '#', icon: IdentificationIcon, current: false },
   { name: 'Applications', href: '/user/apps', icon: PuzzlePieceIcon, current: false },
-  { name: 'Watch Events', href: '/user/watch', icon: TicketIcon, current: false },
+  { name: 'Watch Events', href: '/user/worker', icon: TicketIcon, current: false },
 ]
 
 const userNavigation = [
@@ -28,12 +27,11 @@ function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ')
 }
 
-export const CockPit = ({ children }: { children: ReactNode }) => {
+export const PrivateLayout = () => {
   const { user, logout } = useUser(state => ({ user: state.user, logout: state.logout }))
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <Main className="flex items-stretch content-stretch z-20">
       <>
         <div className="h-full">
           <Transition.Root show={sidebarOpen} as={Fragment}>
@@ -248,11 +246,10 @@ export const CockPit = ({ children }: { children: ReactNode }) => {
               </div>
             </div>
             <main className="relative py-10 px-10 w-full h-[calc(100%_-_4rem)]">
-              {children}
+              <Outlet />
             </main>
           </div>
         </div>
       </>
-    </Main>
   )
 }

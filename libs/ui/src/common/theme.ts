@@ -14,6 +14,15 @@ function saturation(colors: object, amnt = 0) {
 export function getTheme({ defaultTheme, defaultColors }: { defaultTheme: any, defaultColors: any }) {
     return {
         extend: {
+            animation: {
+              'fade-in': 'fadeIn 500ms linear',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              }
+            },
             fontFamily: {
                 sans: ['Inter', ...defaultTheme.fontFamily.sans],
             },

@@ -19,17 +19,3 @@ html, body, #root {
 body {
   display: block;
 }
-
-body.loading, body.loading * {
-  display: none;
-  transition: none !important;
-}
-
-#dev {
-  display: none !important; 
-}
-
-body.dark #dev,
-body.light #dev {
-  display: block !important;
-}

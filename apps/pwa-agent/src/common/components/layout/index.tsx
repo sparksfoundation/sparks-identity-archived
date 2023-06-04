@@ -1,2 +1,2 @@
-export * from './main'
-export * from './footer'
+export * from './PublicLayout'
+export * from './PrivateLayout'

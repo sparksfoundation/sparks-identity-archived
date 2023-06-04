@@ -8,9 +8,7 @@ export enum Themes {
 }
 
 export interface ThemeStore {
-  hasHydrated: boolean;
   theme: Themes;
-  setHasHydrated: (state: boolean) => void;
   setTheme: (theme: string) => void;
   toggleTheme: () => void;
 }
@@ -18,10 +16,6 @@ export interface ThemeStore {
 export const useTheme = create<ThemeStore>()(
   persist((set, get) => ({
     theme: Themes.dark,
-    hasHydrated: false,
-    setHasHydrated: (state) => {
-      set({ hasHydrated: state });
-    },
     setTheme: (theme: string) => {
       set({ theme } as { theme: Themes });
     },
@@ -34,9 +28,5 @@ export const useTheme = create<ThemeStore>()(
     name: 'theme',
     version: 1,
     storage: createJSONStorage(() => storage),
-    onRehydrateStorage: () => (state) => {
-      if (!state) return
-      state.setHasHydrated(true)
-    }
   })
 );
