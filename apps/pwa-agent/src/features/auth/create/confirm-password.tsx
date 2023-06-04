@@ -1,4 +1,4 @@
-import { Button, Card, H3, P, Input, Error, clsxm, Label} from "ui"
+import { Button, Card, H3, P, Input, Error, clsxm, Label} from "sparks-ui"
 import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

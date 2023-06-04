@@ -1,5 +1,5 @@
 {
-  "name": "agent",
+  "name": "sparks-sdk",
   "private": true,
   "version": "0.0.1",
   "description": "an agent for controllers in the sparks ecosystem",

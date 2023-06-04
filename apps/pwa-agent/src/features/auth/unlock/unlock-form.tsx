@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { FormEventHandler, useEffect } from "react";
 import { Member } from "@stores/members";
-import { Button, Card, H3, P, Input, Label, Error, clsxm } from "ui"
+import { Button, Card, H3, P, Input, Label, Error, clsxm } from "sparks-ui"
 import { Buffer } from "buffer";
 
 const formSchema = z.object({

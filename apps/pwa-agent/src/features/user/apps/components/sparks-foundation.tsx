@@ -1,5 +1,5 @@
 import sparksfoundation from '../assets/covers/sparksfoundation.png'
-import { Button, Card, H5, P } from "ui"
+import { Button, Card, H5, P } from "sparks-ui"
 // @ts-ignore
 import { connect } from "@features/channels"
 import { useUser } from "@stores/user"

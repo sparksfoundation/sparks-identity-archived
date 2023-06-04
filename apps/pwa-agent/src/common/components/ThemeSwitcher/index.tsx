@@ -1,5 +1,5 @@
 import { MoonIcon, SunIcon } from "@heroicons/react/20/solid";
-import { clsxm } from "ui";
+import { clsxm } from "sparks-ui";
 import { useTheme, Themes } from "@stores/theme";
 
 export const ThemeSwitcher = ({ className = '', fill = '' }: { className?: string, fill?: string }) => {

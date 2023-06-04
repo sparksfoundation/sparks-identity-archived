@@ -1,4 +1,4 @@
-import { clsxm } from "ui";
+import { clsxm } from "sparks-ui";
 import { DivProps } from "react-html-props";
 import { SetName } from "./set-name";
 import { useEffect, useState } from "react";

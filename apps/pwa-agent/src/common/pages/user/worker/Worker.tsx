@@ -1,4 +1,4 @@
-import { Button, Card, P } from "ui";
+import { Button, Card, P } from "sparks-ui";
 // @ts-ignore
 import DHT from '@hyperswarm/dht-relay';
 // @ts-ignore

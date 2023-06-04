@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom"
-import { NoiseBackground, Triangle } from "ui"
+import { NoiseBackground, Triangle } from "sparks-ui"
 import { ThemeSwitcher } from "@components/ThemeSwitcher"
 
 export const PublicLayout = () => {

@@ -7,7 +7,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { Cog6ToothIcon, HomeModernIcon, IdentificationIcon, PuzzlePieceIcon, TicketIcon } from "@heroicons/react/24/solid"
-import { H4, Logo, NoiseBackground, } from "ui"
+import { H4, Logo, NoiseBackground, } from "sparks-ui"
 import { ThemeSwitcher } from "@components/ThemeSwitcher"
 import { Link, Outlet } from "react-router-dom";
 

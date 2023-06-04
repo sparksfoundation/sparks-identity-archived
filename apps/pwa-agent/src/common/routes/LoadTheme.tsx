@@ -1,6 +1,6 @@
 import { useTheme } from "@stores/theme"
 import { Outlet } from "react-router-dom"
-import { clsxm } from "ui"
+import { clsxm } from "sparks-ui"
 
 const DevHeader = () => {
   return (

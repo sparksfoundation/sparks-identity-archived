@@ -1,6 +1,6 @@
 import { DivProps } from "react-html-props";
 import { Member, useMembers } from "@stores/members";
-import { Button, Card, H3, P, clsxm } from "ui"
+import { Button, Card, H3, P, clsxm } from "sparks-ui"
 import { Buffer } from "buffer";
 import { Identity } from "@features/identity";
 import { useState } from "react";

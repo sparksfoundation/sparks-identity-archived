@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { Card, H3, clsxm, Button, H1, P, Triangle } from 'ui'
+import { Card, H3, clsxm, Button, H1, P, Triangle } from 'sparks-ui'
 import { ThemeSwitcher } from "@components/ThemeSwitcher"
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { ReactNode } from "react";
