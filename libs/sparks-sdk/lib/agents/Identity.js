@@ -2,8 +2,8 @@ import {
   __privateAdd,
   __privateGet,
   __privateSet
-} from "../chunk-S6GDW532.js";
-var _keyPairs, _identifier, _keyEventLog;
+} from "../chunk-GUTKD5ZG.js";
+var _keyPairs, _identifier, _keyEventLog, _connections;
 import util from "tweetnacl-util";
 import { blake3 } from "@noble/hashes/blake3";
 import nacl from "tweetnacl";
@@ -12,6 +12,7 @@ class Identity {
     __privateAdd(this, _keyPairs, void 0);
     __privateAdd(this, _identifier, void 0);
     __privateAdd(this, _keyEventLog, void 0);
+    __privateAdd(this, _connections, []);
   }
   __parseJSON(string) {
     if (typeof string !== "string")
@@ -22,11 +23,20 @@ class Identity {
       return null;
     }
   }
+  get connections() {
+    return __privateGet(this, _connections);
+  }
   get identifier() {
     return __privateGet(this, _identifier);
   }
   get keyEventLog() {
     return __privateGet(this, _keyEventLog);
+  }
+  get publicKeys() {
+    return {
+      signing: __privateGet(this, _keyPairs).signing.publicKey,
+      encryption: __privateGet(this, _keyPairs).encryption.publicKey
+    };
   }
   incept({ keyPairs, nextKeyPairs, backers = [] }) {
     if (__privateGet(this, _identifier) || __privateGet(this, _keyEventLog)?.length) {
@@ -96,7 +106,8 @@ class Identity {
     rotationEvent.selfAddressingIdentifier = signedEventHash;
     __privateGet(this, _keyEventLog).push(rotationEvent);
   }
-  destroy({ backers = [] }) {
+  destroy(args) {
+    const { backers = [] } = args || {};
     if (!__privateGet(this, _identifier) || !__privateGet(this, _keyEventLog)?.length) {
       throw Error("Identity does not exist");
     }
@@ -196,6 +207,15 @@ class Identity {
       return this.__parseJSON(utf8Result) || utf8Result;
     }
   }
+  addConnection(Connection) {
+    return new Connection({
+      keyPairs: __privateGet(this, _keyPairs),
+      encrypt: this.encrypt.bind(this),
+      decrypt: this.decrypt.bind(this),
+      sign: this.sign.bind(this),
+      verify: this.verify.bind(this)
+    });
+  }
   toJSON() {
     return {
       identifier: __privateGet(this, _identifier),
@@ -206,6 +226,7 @@ class Identity {
 _keyPairs = new WeakMap();
 _identifier = new WeakMap();
 _keyEventLog = new WeakMap();
+_connections = new WeakMap();
 export {
   Identity
 };

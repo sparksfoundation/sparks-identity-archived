@@ -1,5 +1,5 @@
 "use strict";Object.defineProperty(exports, "__esModule", {value: true});require('../chunk-SIAYTN4T.cjs');
-var _Identityjs = require('./Identity.js');
+var _PostMessagejs = require('./PostMessage.js');
 
 
-exports.Identity = _Identityjs.Identity;
+exports.PostMessage = _PostMessagejs.PostMessage;

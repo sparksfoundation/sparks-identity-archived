@@ -1,5 +1,5 @@
 import util from "tweetnacl-util";
-import { KeyPairs, PublicSigningKey } from "../forge/types.js";
+import { KeyPairs, PublicEncryptionKey, PublicSigningKey } from "../forge/types.js";
 import { blake3 } from '@noble/hashes/blake3';
 import nacl from "tweetnacl";
 
@@ -15,7 +15,7 @@ type RotateProps = {
   backers?: PublicSigningKey[];
 }
 
-type DestroyProps = {
+type DestroyProps = undefined | {
   backers?: PublicSigningKey[];
 }
 
@@ -30,12 +30,14 @@ interface IdentityInterface {
   toJSON(): object;
   identifier: string;
   keyEventLog: object[];
+  publicKeys: { signing: PublicSigningKey; encryption: PublicEncryptionKey; };
 }
 
 export class Identity implements IdentityInterface {
   #keyPairs: KeyPairs;
   #identifier: string;
   #keyEventLog: object[];
+  #connections: object[] = [];
 
   // convenience to return null if not valid
   private __parseJSON(string) {
@@ -47,7 +49,11 @@ export class Identity implements IdentityInterface {
     }
   }
 
-  constructor() {}
+  constructor() { }
+
+  get connections() {
+    return this.#connections;
+  }
 
   get identifier() {
     return this.#identifier;
@@ -55,6 +61,13 @@ export class Identity implements IdentityInterface {
 
   get keyEventLog() {
     return this.#keyEventLog;
+  }
+
+  get publicKeys() {
+    return {
+      signing: this.#keyPairs.signing.publicKey,
+      encryption: this.#keyPairs.encryption.publicKey,
+    };
   }
 
   incept({ keyPairs, nextKeyPairs, backers = [] }: InceptProps) {
@@ -148,7 +161,8 @@ export class Identity implements IdentityInterface {
     this.#keyEventLog.push(rotationEvent);
   }
 
-  destroy({ backers = [] }: DestroyProps) {
+  destroy(args: DestroyProps) {
+    const { backers = [] } = args || {};
     if (!this.#identifier || !this.#keyEventLog?.length) {
       throw Error('Identity does not exist');
     }
@@ -184,7 +198,7 @@ export class Identity implements IdentityInterface {
     if (!this.#keyPairs) {
       throw new Error('No key pairs found, please import or incept identity')
     }
-    
+
     const utfData = typeof data === 'string' ? data : JSON.stringify(data);
     const uintData = util.decodeUTF8(utfData);
     const nonce = nacl.randomBytes(nacl.box.nonceLength);
@@ -234,7 +248,7 @@ export class Identity implements IdentityInterface {
 
     const utf8Result = util.encodeUTF8(decrypted);
     const result = this.__parseJSON(utf8Result) || utf8Result;
-    return  result;
+    return result;
   }
 
   sign({ message, detached = false }: { message: object | string; detached?: boolean }) {
@@ -269,6 +283,16 @@ export class Identity implements IdentityInterface {
       const utf8Result = util.encodeUTF8(uintResult);
       return this.__parseJSON(utf8Result) || utf8Result;
     }
+  }
+
+  addConnection(Connection) {
+    return new Connection({
+      keyPairs: this.#keyPairs,
+      encrypt: this.encrypt.bind(this),
+      decrypt: this.decrypt.bind(this),
+      sign: this.sign.bind(this),
+      verify: this.verify.bind(this),
+    });
   }
 
   toJSON() {

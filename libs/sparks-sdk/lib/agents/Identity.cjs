@@ -2,16 +2,17 @@
 
 
 
-var _chunkWMBHDRFCcjs = require('../chunk-WMBHDRFC.cjs');
-var _keyPairs, _identifier, _keyEventLog;
+var _chunkSIAYTN4Tcjs = require('../chunk-SIAYTN4T.cjs');
+var _keyPairs, _identifier, _keyEventLog, _connections;
 var _tweetnaclutil = require('tweetnacl-util'); var _tweetnaclutil2 = _interopRequireDefault(_tweetnaclutil);
 var _blake3 = require('@noble/hashes/blake3');
 var _tweetnacl = require('tweetnacl'); var _tweetnacl2 = _interopRequireDefault(_tweetnacl);
 class Identity {
   constructor() {
-    _chunkWMBHDRFCcjs.__privateAdd.call(void 0, this, _keyPairs, void 0);
-    _chunkWMBHDRFCcjs.__privateAdd.call(void 0, this, _identifier, void 0);
-    _chunkWMBHDRFCcjs.__privateAdd.call(void 0, this, _keyEventLog, void 0);
+    _chunkSIAYTN4Tcjs.__privateAdd.call(void 0, this, _keyPairs, void 0);
+    _chunkSIAYTN4Tcjs.__privateAdd.call(void 0, this, _identifier, void 0);
+    _chunkSIAYTN4Tcjs.__privateAdd.call(void 0, this, _keyEventLog, void 0);
+    _chunkSIAYTN4Tcjs.__privateAdd.call(void 0, this, _connections, []);
   }
   __parseJSON(string) {
     if (typeof string !== "string")
@@ -22,14 +23,23 @@ class Identity {
       return null;
     }
   }
+  get connections() {
+    return _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _connections);
+  }
   get identifier() {
-    return _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _identifier);
+    return _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _identifier);
   }
   get keyEventLog() {
-    return _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog);
+    return _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog);
+  }
+  get publicKeys() {
+    return {
+      signing: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey,
+      encryption: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).encryption.publicKey
+    };
   }
   incept({ keyPairs, nextKeyPairs, backers = [] }) {
-    if (_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _identifier) || _optionalChain([_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog), 'optionalAccess', _ => _.length])) {
+    if (_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _identifier) || _optionalChain([_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog), 'optionalAccess', _ => _.length])) {
       throw Error("Identity already incepted");
     }
     if (!keyPairs) {
@@ -38,9 +48,9 @@ class Identity {
     if (!nextKeyPairs) {
       throw new Error("Next signing key commitment required for inception");
     }
-    _chunkWMBHDRFCcjs.__privateSet.call(void 0, this, _keyPairs, keyPairs);
-    const identifier = `B${_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey.replace(/=$/, "")}`;
-    const publicSigningKey = _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey;
+    _chunkSIAYTN4Tcjs.__privateSet.call(void 0, this, _keyPairs, keyPairs);
+    const identifier = `B${_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey.replace(/=$/, "")}`;
+    const publicSigningKey = _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey;
     const nextKeyHash = _tweetnaclutil2.default.encodeBase64(_blake3.blake3.call(void 0, _tweetnaclutil2.default.decodeBase64(nextKeyPairs.signing.publicKey)));
     const inceptionEvent = {
       identifier,
@@ -58,11 +68,11 @@ class Identity {
     const signedEventHash = this.sign({ message: hashedEvent, detached: true });
     inceptionEvent.version = version;
     inceptionEvent.selfAddressingIdentifier = signedEventHash;
-    _chunkWMBHDRFCcjs.__privateSet.call(void 0, this, _identifier, identifier);
-    _chunkWMBHDRFCcjs.__privateSet.call(void 0, this, _keyEventLog, [inceptionEvent]);
+    _chunkSIAYTN4Tcjs.__privateSet.call(void 0, this, _identifier, identifier);
+    _chunkSIAYTN4Tcjs.__privateSet.call(void 0, this, _keyEventLog, [inceptionEvent]);
   }
   rotate({ keyPairs, nextKeyPairs, backers = [] }) {
-    if (!_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _identifier) || !_optionalChain([_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog), 'optionalAccess', _2 => _2.length])) {
+    if (!_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _identifier) || !_optionalChain([_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog), 'optionalAccess', _2 => _2.length])) {
       throw Error("Keys can not be rotated before inception");
     }
     if (!keyPairs) {
@@ -71,15 +81,15 @@ class Identity {
     if (!nextKeyPairs) {
       throw new Error("Next signing key committment required for rotation");
     }
-    if (_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog)[_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).length - 1].eventType === "destruction") {
+    if (_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog)[_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog).length - 1].eventType === "destruction") {
       throw new Error("Keys can not be rotated after destruction");
     }
-    _chunkWMBHDRFCcjs.__privateSet.call(void 0, this, _keyPairs, keyPairs);
-    const oldKeyEvent = _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog)[_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).length - 1];
-    const publicSigningKey = _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey;
+    _chunkSIAYTN4Tcjs.__privateSet.call(void 0, this, _keyPairs, keyPairs);
+    const oldKeyEvent = _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog)[_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog).length - 1];
+    const publicSigningKey = _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey;
     const nextKeyHash = _tweetnaclutil2.default.encodeBase64(_blake3.blake3.call(void 0, _tweetnaclutil2.default.decodeBase64(nextKeyPairs.signing.publicKey)));
     const rotationEvent = {
-      identifier: _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _identifier),
+      identifier: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _identifier),
       eventIndex: (parseInt(oldKeyEvent.eventIndex) + 1).toString(),
       eventType: "rotation",
       signingThreshold: oldKeyEvent.signatureThreshold,
@@ -94,16 +104,17 @@ class Identity {
     const signedEventHash = this.sign({ message: hashedEvent, detached: true });
     rotationEvent.version = version;
     rotationEvent.selfAddressingIdentifier = signedEventHash;
-    _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).push(rotationEvent);
+    _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog).push(rotationEvent);
   }
-  destroy({ backers = [] }) {
-    if (!_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _identifier) || !_optionalChain([_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog), 'optionalAccess', _3 => _3.length])) {
+  destroy(args) {
+    const { backers = [] } = args || {};
+    if (!_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _identifier) || !_optionalChain([_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog), 'optionalAccess', _3 => _3.length])) {
       throw Error("Identity does not exist");
     }
-    const oldKeyEvent = _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog)[_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).length - 1];
-    const publicSigningKey = _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey;
+    const oldKeyEvent = _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog)[_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog).length - 1];
+    const publicSigningKey = _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey;
     const rotationEvent = {
-      identifier: _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _identifier),
+      identifier: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _identifier),
       eventIndex: (parseInt(oldKeyEvent.eventIndex) + 1).toString(),
       eventType: "destruction",
       signingThreshold: oldKeyEvent.signingThreshold,
@@ -118,10 +129,10 @@ class Identity {
     const signedEventHash = this.sign({ message: hashedEvent, detached: true });
     rotationEvent.version = version;
     rotationEvent.selfAddressingIdentifier = signedEventHash;
-    _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog).push(rotationEvent);
+    _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog).push(rotationEvent);
   }
   encrypt({ data, publicKey, sharedKey }) {
-    if (!_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs)) {
+    if (!_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs)) {
       throw new Error("No key pairs found, please import or incept identity");
     }
     const utfData = typeof data === "string" ? data : JSON.stringify(data);
@@ -130,12 +141,12 @@ class Identity {
     let box;
     if (publicKey) {
       const publicKeyUint = _tweetnaclutil2.default.decodeBase64(publicKey);
-      box = _tweetnacl2.default.box(uintData, nonce, publicKeyUint, _tweetnaclutil2.default.decodeBase64(_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs).encryption.secretKey));
+      box = _tweetnacl2.default.box(uintData, nonce, publicKeyUint, _tweetnaclutil2.default.decodeBase64(_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).encryption.secretKey));
     } else if (sharedKey) {
       const sharedKeyUint = _tweetnaclutil2.default.decodeBase64(sharedKey);
       box = _tweetnacl2.default.box.after(uintData, nonce, sharedKeyUint);
     } else {
-      const secreKeyUint = _tweetnaclutil2.default.decodeBase64(_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs).encryption.secretKey);
+      const secreKeyUint = _tweetnaclutil2.default.decodeBase64(_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).encryption.secretKey);
       box = _tweetnacl2.default.secretbox(uintData, nonce, secreKeyUint);
     }
     const encrypted = new Uint8Array(nonce.length + box.length);
@@ -144,7 +155,7 @@ class Identity {
     return _tweetnaclutil2.default.encodeBase64(encrypted);
   }
   decrypt({ data, publicKey, sharedKey }) {
-    if (!_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs)) {
+    if (!_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs)) {
       throw new Error("No key pairs found, please import or incept identity");
     }
     const uintData = _tweetnaclutil2.default.decodeBase64(data);
@@ -153,12 +164,12 @@ class Identity {
     let decrypted;
     if (publicKey) {
       const publicKeyUint = _tweetnaclutil2.default.decodeBase64(publicKey);
-      decrypted = _tweetnacl2.default.box.open(message, nonce, publicKeyUint, _tweetnaclutil2.default.decodeBase64(_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs).encryption.secretKey));
+      decrypted = _tweetnacl2.default.box.open(message, nonce, publicKeyUint, _tweetnaclutil2.default.decodeBase64(_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).encryption.secretKey));
     } else if (sharedKey) {
       const sharedKeyUint = _tweetnaclutil2.default.decodeBase64(sharedKey);
       decrypted = _tweetnacl2.default.box.open.after(message, nonce, sharedKeyUint);
     } else {
-      const secreKeyUint = _tweetnaclutil2.default.decodeBase64(_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs).encryption.secretKey);
+      const secreKeyUint = _tweetnaclutil2.default.decodeBase64(_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).encryption.secretKey);
       decrypted = _tweetnacl2.default.secretbox.open(message, nonce, secreKeyUint);
     }
     if (!decrypted) {
@@ -173,7 +184,7 @@ class Identity {
       message = this.__parseJSON(message);
     }
     const uintMessage = _tweetnaclutil2.default.decodeUTF8(message);
-    const uintSecretKey = _tweetnaclutil2.default.decodeBase64(_chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyPairs).signing.secretKey);
+    const uintSecretKey = _tweetnaclutil2.default.decodeBase64(_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).signing.secretKey);
     const signature = detached ? _tweetnaclutil2.default.encodeBase64(_tweetnacl2.default.sign.detached(uintMessage, uintSecretKey)) : _tweetnaclutil2.default.encodeBase64(_tweetnacl2.default.sign(uintMessage, uintSecretKey));
     return signature;
   }
@@ -196,16 +207,26 @@ class Identity {
       return this.__parseJSON(utf8Result) || utf8Result;
     }
   }
+  addConnection(Connection) {
+    return new Connection({
+      keyPairs: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs),
+      encrypt: this.encrypt.bind(this),
+      decrypt: this.decrypt.bind(this),
+      sign: this.sign.bind(this),
+      verify: this.verify.bind(this)
+    });
+  }
   toJSON() {
     return {
-      identifier: _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _identifier),
-      keyEventLog: _chunkWMBHDRFCcjs.__privateGet.call(void 0, this, _keyEventLog)
+      identifier: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _identifier),
+      keyEventLog: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog)
     };
   }
 }
 _keyPairs = new WeakMap();
 _identifier = new WeakMap();
 _keyEventLog = new WeakMap();
+_connections = new WeakMap();
 
 
 exports.Identity = Identity;

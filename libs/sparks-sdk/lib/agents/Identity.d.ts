@@ -1,4 +1,4 @@
-import { KeyPairs, PublicSigningKey } from '../forge/types.js';
+import { KeyPairs, PublicSigningKey, PublicEncryptionKey } from '../forge/types.js';
 
 declare type InceptProps = {
     keyPairs: KeyPairs;
@@ -10,7 +10,7 @@ declare type RotateProps = {
     nextKeyPairs: KeyPairs;
     backers?: PublicSigningKey[];
 };
-declare type DestroyProps = {
+declare type DestroyProps = undefined | {
     backers?: PublicSigningKey[];
 };
 interface IdentityInterface {
@@ -39,16 +39,25 @@ interface IdentityInterface {
     toJSON(): object;
     identifier: string;
     keyEventLog: object[];
+    publicKeys: {
+        signing: PublicSigningKey;
+        encryption: PublicEncryptionKey;
+    };
 }
 declare class Identity implements IdentityInterface {
     #private;
     private __parseJSON;
     constructor();
+    get connections(): object[];
     get identifier(): string;
     get keyEventLog(): object[];
+    get publicKeys(): {
+        signing: string;
+        encryption: string;
+    };
     incept({ keyPairs, nextKeyPairs, backers }: InceptProps): void;
     rotate({ keyPairs, nextKeyPairs, backers }: RotateProps): void;
-    destroy({ backers }: DestroyProps): void;
+    destroy(args: DestroyProps): void;
     encrypt({ data, publicKey, sharedKey }: {
         data: object | string;
         publicKey?: string;
@@ -68,6 +77,7 @@ declare class Identity implements IdentityInterface {
         signature: any;
         message: any;
     }): any;
+    addConnection(Connection: any): any;
     toJSON(): {
         identifier: string;
         keyEventLog: object[];
