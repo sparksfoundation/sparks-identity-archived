@@ -1,3 +1,11 @@
+# ARCHIVED 
+Monorepo has been archived in preference to split approach. See 
+- sparks-app
+- sparks-ui
+- sparks-api
+- sparks-sdk
+- ...
+
 # Sparks Identity
 
 ### Repository Structure
