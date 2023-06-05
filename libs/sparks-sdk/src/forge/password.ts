@@ -61,8 +61,4 @@ const keyPairs = async ({ password, identity = '' }) => {
   });
 }
 
-export default {
-  signingKeyPair,
-  encryptionKeyPair,
-  keyPairs,
-} as PasswordForge;
+export default keyPairs as PasswordForge;

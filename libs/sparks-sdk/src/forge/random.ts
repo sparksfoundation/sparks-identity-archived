@@ -27,8 +27,4 @@ const keyPairs = async () => {
   });
 }
 
-export default {
-  signingKeyPair,
-  encryptionKeyPair,
-  keyPairs,
-} as RandomForge;
+export default keyPairs as RandomForge;

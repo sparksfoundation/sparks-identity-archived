@@ -5,13 +5,13 @@ import nacl from "tweetnacl";
 
 type InceptProps = undefined | {
   keyPairs: KeyPairs;
-  nextSigningKey: PublicSigningKey;
+  nextKeyPairs: KeyPairs;
   backers?: PublicSigningKey[];
 }
 
 type RotateProps = undefined | {
   keyPairs: KeyPairs;
-  nextSigningKey: PublicSigningKey;
+  nextKeyPairs: KeyPairs;
   backers?: PublicSigningKey[];
 }
 
@@ -23,6 +23,9 @@ interface IdentityInterface {
   decrypt({ data, publicKey, sharedKey }: { data: object | string; publicKey?: string; sharedKey?: string; }): string;
   sign({ message, detached }: { message: object | string; detached?: boolean }): string;
   verify({ publicKey, signature, message }: { publicKey: string; signature: string; message: object | string }): boolean | string;
+  toJSON(): object;
+  identifier: string;
+  keyEventLog: object[];
 }
 
 export class Identity implements IdentityInterface {
@@ -40,13 +43,6 @@ export class Identity implements IdentityInterface {
     }
   }
 
-  toJSON() {
-    return {
-      identifier: this.#identifier,
-      keyEventLog: this.#keyEventLog,
-    };
-  }
-
   constructor() {
   }
 
@@ -59,20 +55,20 @@ export class Identity implements IdentityInterface {
   }
 
   incept(args?: InceptProps) {
-    let { keyPairs, nextSigningKey, backers = [] } = args || {};
+    let { keyPairs, nextKeyPairs, backers = [] } = args || {};
 
     if (!keyPairs) {
       throw new Error('Key pairs required for inception')
     }
 
-    if (!nextSigningKey) {
+    if (!nextKeyPairs) {
       throw new Error('Next signing key commitment required for inception')
     }
 
     this.#keyPairs = keyPairs;
     const identifier = `B${this.#keyPairs.signing.publicKey.replace(/=$/, '')}`;
     const publicSigningKey = this.#keyPairs.signing.publicKey;
-    const nextKeyHash = util.encodeBase64(blake3(util.decodeBase64(nextSigningKey)));
+    const nextKeyHash = util.encodeBase64(blake3(util.decodeBase64(nextKeyPairs.signing.publicKey)));
 
     const inceptionEvent = {
       identifier: identifier, // i: AID identifier prefix
@@ -101,7 +97,7 @@ export class Identity implements IdentityInterface {
   }
 
   rotate(args?: RotateProps) {
-    let { keyPairs, nextSigningKey, backers = [] } = args || {};
+    let { keyPairs, nextKeyPairs, backers = [] } = args || {};
 
     if (!this.#identifier || !this.#keyEventLog.length) {
       throw Error('Keys can not be rotated before inception');
@@ -111,14 +107,14 @@ export class Identity implements IdentityInterface {
       throw new Error('Key pairs required for rotation')
     }
 
-    if (!nextSigningKey) {
+    if (!nextKeyPairs) {
       throw new Error('Next signing key committment required for rotation')
     }
 
     this.#keyPairs = keyPairs;
     const oldKeyEvent = this.#keyEventLog[this.#keyEventLog.length - 1] as any;
     const publicSigningKey = this.#keyPairs.signing.publicKey;
-    const nextKeyHash = util.encodeBase64(blake3(util.decodeBase64(nextSigningKey)));
+    const nextKeyHash = util.encodeBase64(blake3(util.decodeBase64(nextKeyPairs.signing.publicKey)));
 
     const rotationEvent = {
       identifier: this.#identifier,
@@ -145,8 +141,21 @@ export class Identity implements IdentityInterface {
 
   destroy() {}
 
+  // todo -- add asymmetric key encryption options
   encrypt({ data, publicKey, sharedKey }: { data: object | string; publicKey?: string; sharedKey?: string; }): string {
-    return '';
+    if (!this.#keyPairs) {
+      throw new Error('No current keys')
+    }
+
+    const dataString = typeof data === 'string' ? data : this.__parseJSON(data);
+    const secreKeyUint = util.decodeBase64(this.#keyPairs.encryption.secretKey);
+    const nonce = nacl.randomBytes(nacl.box.nonceLength);
+    const message = util.decodeUTF8(dataString);
+    const box = nacl.secretbox(message, nonce, secreKeyUint);
+    const encrypted = new Uint8Array(nonce.length + box.length);
+    encrypted.set(nonce);
+    encrypted.set(box, nonce.length);
+    return util.encodeBase64(encrypted);
   }
 
   decrypt({ data, publicKey, sharedKey }: { data: object | string; publicKey?: string; sharedKey?: string; }): string {
@@ -154,7 +163,7 @@ export class Identity implements IdentityInterface {
   }
 
   sign({ message, detached = false }: { message: object | string; detached?: boolean }) {
-    if (typeof message !== 'string' && !((message as any) instanceof String)) {
+    if (typeof message !== 'string') {
       message = this.__parseJSON(message);
     }
     const uintMessage = util.decodeUTF8(message as string);
@@ -185,5 +194,12 @@ export class Identity implements IdentityInterface {
       const utf8Result = util.encodeUTF8(uintResult);
       return this.__parseJSON(utf8Result) || utf8Result;
     }
+  }
+
+  toJSON() {
+    return {
+      identifier: this.#identifier,
+      keyEventLog: this.#keyEventLog,
+    };
   }
 }

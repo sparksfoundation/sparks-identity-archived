@@ -19,15 +19,9 @@ export type KeyPairs = {
 }
 
 export type PublicSigningKey = string;
+export type SecretSigningKey = string;
+export type PublicEncryptionKey = string;
+export type SecretEncryptionKey = string;
 
-export type RandomForge = {
-  signingKeyPair(): Promise<KeyPair>;
-  encryptionKeyPair(): Promise<KeyPair>;
-  keyPairs(): Promise<KeyPairs>;
-}
-
-export type PasswordForge = {
-  signingKeyPair(args: { password: string, identity: any }): Promise<KeyPair>;
-  encryptionKeyPair(args: { password: string, identity: any }): Promise<KeyPair>;
-  keyPairs(args: { password: string, identity: any }): Promise<KeyPairs>;
-}
+export type RandomForge = () => Promise<KeyPairs>;
+export type PasswordForge = (args: { password: string, identity: any }) => Promise<KeyPairs>;

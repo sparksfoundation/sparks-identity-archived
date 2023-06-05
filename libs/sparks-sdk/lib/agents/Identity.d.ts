@@ -2,12 +2,12 @@ import { KeyPairs, PublicSigningKey } from '../forge/types.js';
 
 declare type InceptProps = undefined | {
     keyPairs: KeyPairs;
-    nextSigningKey: PublicSigningKey;
+    nextKeyPairs: KeyPairs;
     backers?: PublicSigningKey[];
 };
 declare type RotateProps = undefined | {
     keyPairs: KeyPairs;
-    nextSigningKey: PublicSigningKey;
+    nextKeyPairs: KeyPairs;
     backers?: PublicSigningKey[];
 };
 interface IdentityInterface {
@@ -33,14 +33,13 @@ interface IdentityInterface {
         signature: string;
         message: object | string;
     }): boolean | string;
+    toJSON(): object;
+    identifier: string;
+    keyEventLog: object[];
 }
 declare class Identity implements IdentityInterface {
     #private;
     private __parseJSON;
-    toJSON(): {
-        identifier: string;
-        keyEventLog: object[];
-    };
     constructor();
     get identifier(): string;
     get keyEventLog(): object[];
@@ -66,6 +65,10 @@ declare class Identity implements IdentityInterface {
         signature: any;
         message: any;
     }): any;
+    toJSON(): {
+        identifier: string;
+        keyEventLog: object[];
+    };
 }
 
 export { Identity };

@@ -15,24 +15,13 @@ declare type KeyPairs = {
     encryption: KeyPair;
 };
 declare type PublicSigningKey = string;
-declare type RandomForge = {
-    signingKeyPair(): Promise<KeyPair>;
-    encryptionKeyPair(): Promise<KeyPair>;
-    keyPairs(): Promise<KeyPairs>;
-};
-declare type PasswordForge = {
-    signingKeyPair(args: {
-        password: string;
-        identity: any;
-    }): Promise<KeyPair>;
-    encryptionKeyPair(args: {
-        password: string;
-        identity: any;
-    }): Promise<KeyPair>;
-    keyPairs(args: {
-        password: string;
-        identity: any;
-    }): Promise<KeyPairs>;
-};
+declare type SecretSigningKey = string;
+declare type PublicEncryptionKey = string;
+declare type SecretEncryptionKey = string;
+declare type RandomForge = () => Promise<KeyPairs>;
+declare type PasswordForge = (args: {
+    password: string;
+    identity: any;
+}) => Promise<KeyPairs>;
 
-export { KeyPair, KeyPairs, PasswordForge, PublicKeys, PublicSigningKey, RandomForge, SecretKeys };
+export { KeyPair, KeyPairs, PasswordForge, PublicEncryptionKey, PublicKeys, PublicSigningKey, RandomForge, SecretEncryptionKey, SecretKeys, SecretSigningKey };

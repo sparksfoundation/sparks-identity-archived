@@ -23,11 +23,7 @@ const keyPairs = async () => {
     };
   });
 };
-var random_default = {
-  signingKeyPair,
-  encryptionKeyPair,
-  keyPairs
-};
+var random_default = keyPairs;
 export {
   random_default as default
 };

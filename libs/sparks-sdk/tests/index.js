@@ -6,28 +6,25 @@ import assert from 'node:assert';
 
 (async function () {
   const identity = new Identity()
-  let keyPairs, nextKeys, password
+  let keyPairs, nextKeyPairs, password
   password = 'password'
 
-  keyPairs = await forge.random.keyPairs()
-  nextKeys = await forge.password.keyPairs({ password, identity })
-  await identity.incept({ keyPairs, nextSigningKey: nextKeys.signing.publicKey })
+  keyPairs = await forge.random()
+  nextKeyPairs = await forge.password({ password, identity })
+  await identity.incept({ keyPairs, nextKeyPairs: nextKeyPairs })
 
-  keyPairs = { ...nextKeys }
-  nextKeys = await forge.password.keyPairs({ password, identity})
-  await identity.rotate({ keyPairs, nextSigningKey: nextKeys.signing.publicKey })
+  keyPairs = { ...nextKeyPairs }
+  nextKeyPairs = await forge.password({ password, identity})
+  await identity.rotate({ keyPairs, nextKeyPairs: nextKeyPairs })
 
-  keyPairs = { ...nextKeys }
-  nextKeys = await forge.password.keyPairs({ password, identity})
-  await identity.rotate({ keyPairs, nextSigningKey: nextKeys.signing.publicKey })
+  password = 'test'
+  keyPairs = { ...nextKeyPairs }
+  nextKeyPairs = await forge.password({ password, identity})
+  await identity.rotate({ keyPairs, nextKeyPairs: nextKeyPairs })
 
-  keyPairs = { ...nextKeys }
-  nextKeys = await forge.password.keyPairs({ password, identity})
-  await identity.rotate({ keyPairs, nextSigningKey: nextKeys.signing.publicKey })
-
-  keyPairs = { ...nextKeys }
-  nextKeys = await forge.password.keyPairs({ password, identity})
-  await identity.rotate({ keyPairs, nextSigningKey: nextKeys.signing.publicKey })
+  keyPairs = { ...nextKeyPairs }
+  nextKeyPairs = await forge.password({ password, identity})
+  await identity.rotate({ keyPairs, nextKeyPairs: nextKeyPairs })
 
   const events = identity.keyEventLog;
   events.forEach((event, index) => {
@@ -40,7 +37,7 @@ import assert from 'node:assert';
       publicKey: event.signingKeys[0],
     });
     assert.equal(dataInTact, true, 'data integrity failed')
-    console.log('passed: data integrity check')
+    console.log('passed: data integrity')
 
     // let's check that the current key is the same as the previous committed to using
     if (index > 0) {
@@ -49,8 +46,8 @@ import assert from 'node:assert';
         blake3(util.decodeBase64(event.signingKeys[0])),
       );
       const committmentValid = currenKey === keyCommittment;
-      assert.equal(committmentValid, true, 'key commitment check failed')
-      console.log('passed: key commitment check')
+      assert.equal(committmentValid, true, 'key commitment failed')
+      console.log('passed: key commitment')
     }
   });
 }())

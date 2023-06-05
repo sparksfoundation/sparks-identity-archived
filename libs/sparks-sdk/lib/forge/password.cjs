@@ -48,11 +48,7 @@ const keyPairs = async ({ password, identity = "" }) => {
     };
   });
 };
-var password_default = {
-  signingKeyPair,
-  encryptionKeyPair,
-  keyPairs
-};
+var password_default = keyPairs;
 
 
 exports.default = password_default;

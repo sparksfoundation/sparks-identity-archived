@@ -22,12 +22,6 @@ class Identity {
       return null;
     }
   }
-  toJSON() {
-    return {
-      identifier: __privateGet(this, _identifier),
-      keyEventLog: __privateGet(this, _keyEventLog)
-    };
-  }
   get identifier() {
     return __privateGet(this, _identifier);
   }
@@ -35,17 +29,17 @@ class Identity {
     return __privateGet(this, _keyEventLog);
   }
   incept(args) {
-    let { keyPairs, nextSigningKey, backers = [] } = args || {};
+    let { keyPairs, nextKeyPairs, backers = [] } = args || {};
     if (!keyPairs) {
       throw new Error("Key pairs required for inception");
     }
-    if (!nextSigningKey) {
+    if (!nextKeyPairs) {
       throw new Error("Next signing key commitment required for inception");
     }
     __privateSet(this, _keyPairs, keyPairs);
     const identifier = `B${__privateGet(this, _keyPairs).signing.publicKey.replace(/=$/, "")}`;
     const publicSigningKey = __privateGet(this, _keyPairs).signing.publicKey;
-    const nextKeyHash = util.encodeBase64(blake3(util.decodeBase64(nextSigningKey)));
+    const nextKeyHash = util.encodeBase64(blake3(util.decodeBase64(nextKeyPairs.signing.publicKey)));
     const inceptionEvent = {
       identifier,
       eventIndex: "0",
@@ -66,20 +60,20 @@ class Identity {
     __privateSet(this, _keyEventLog, [inceptionEvent]);
   }
   rotate(args) {
-    let { keyPairs, nextSigningKey, backers = [] } = args || {};
+    let { keyPairs, nextKeyPairs, backers = [] } = args || {};
     if (!__privateGet(this, _identifier) || !__privateGet(this, _keyEventLog).length) {
       throw Error("Keys can not be rotated before inception");
     }
     if (!keyPairs) {
       throw new Error("Key pairs required for rotation");
     }
-    if (!nextSigningKey) {
+    if (!nextKeyPairs) {
       throw new Error("Next signing key committment required for rotation");
     }
     __privateSet(this, _keyPairs, keyPairs);
     const oldKeyEvent = __privateGet(this, _keyEventLog)[__privateGet(this, _keyEventLog).length - 1];
     const publicSigningKey = __privateGet(this, _keyPairs).signing.publicKey;
-    const nextKeyHash = util.encodeBase64(blake3(util.decodeBase64(nextSigningKey)));
+    const nextKeyHash = util.encodeBase64(blake3(util.decodeBase64(nextKeyPairs.signing.publicKey)));
     const rotationEvent = {
       identifier: __privateGet(this, _identifier),
       eventIndex: (parseInt(oldKeyEvent.eventIndex) + 1).toString(),
@@ -101,13 +95,24 @@ class Identity {
   destroy() {
   }
   encrypt({ data, publicKey, sharedKey }) {
-    return "";
+    if (!__privateGet(this, _keyPairs)) {
+      throw new Error("No current keys");
+    }
+    const dataString = typeof data === "string" ? data : this.__parseJSON(data);
+    const secreKeyUint = util.decodeBase64(__privateGet(this, _keyPairs).encryption.secretKey);
+    const nonce = nacl.randomBytes(nacl.box.nonceLength);
+    const message = util.decodeUTF8(dataString);
+    const box = nacl.secretbox(message, nonce, secreKeyUint);
+    const encrypted = new Uint8Array(nonce.length + box.length);
+    encrypted.set(nonce);
+    encrypted.set(box, nonce.length);
+    return util.encodeBase64(encrypted);
   }
   decrypt({ data, publicKey, sharedKey }) {
     return "";
   }
   sign({ message, detached = false }) {
-    if (typeof message !== "string" && !(message instanceof String)) {
+    if (typeof message !== "string") {
       message = this.__parseJSON(message);
     }
     const uintMessage = util.decodeUTF8(message);
@@ -133,6 +138,12 @@ class Identity {
       const utf8Result = util.encodeUTF8(uintResult);
       return this.__parseJSON(utf8Result) || utf8Result;
     }
+  }
+  toJSON() {
+    return {
+      identifier: __privateGet(this, _identifier),
+      keyEventLog: __privateGet(this, _keyEventLog)
+    };
   }
 }
 _keyPairs = new WeakMap();
