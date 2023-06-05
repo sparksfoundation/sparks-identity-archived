@@ -18,7 +18,7 @@ declare type PublicSigningKey = string;
 declare type SecretSigningKey = string;
 declare type PublicEncryptionKey = string;
 declare type SecretEncryptionKey = string;
-declare type RandomForge = () => Promise<KeyPairs>;
+declare type RandomForge = () => KeyPairs;
 declare type PasswordForge = (args: {
     password: string;
     identity: any;

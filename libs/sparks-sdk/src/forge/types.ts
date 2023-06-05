@@ -23,5 +23,5 @@ export type SecretSigningKey = string;
 export type PublicEncryptionKey = string;
 export type SecretEncryptionKey = string;
 
-export type RandomForge = () => Promise<KeyPairs>;
+export type RandomForge = () => KeyPairs;
 export type PasswordForge = (args: { password: string, identity: any }) => Promise<KeyPairs>;

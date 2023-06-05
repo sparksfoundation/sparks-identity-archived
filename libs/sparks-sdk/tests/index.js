@@ -9,22 +9,22 @@ import assert from 'node:assert';
   let keyPairs, nextKeyPairs, password
   password = 'password'
 
-  keyPairs = await forge.random()
+  keyPairs = forge.random()
   nextKeyPairs = await forge.password({ password, identity })
-  await identity.incept({ keyPairs, nextKeyPairs: nextKeyPairs })
+  identity.incept({ keyPairs, nextKeyPairs })
 
   keyPairs = { ...nextKeyPairs }
   nextKeyPairs = await forge.password({ password, identity})
-  await identity.rotate({ keyPairs, nextKeyPairs: nextKeyPairs })
+  identity.rotate({ keyPairs, nextKeyPairs: nextKeyPairs })
 
-  password = 'test'
+  password = 'newpassword'
   keyPairs = { ...nextKeyPairs }
   nextKeyPairs = await forge.password({ password, identity})
-  await identity.rotate({ keyPairs, nextKeyPairs: nextKeyPairs })
+  identity.rotate({ keyPairs, nextKeyPairs: nextKeyPairs })
 
   keyPairs = { ...nextKeyPairs }
   nextKeyPairs = await forge.password({ password, identity})
-  await identity.rotate({ keyPairs, nextKeyPairs: nextKeyPairs })
+  identity.rotate({ keyPairs, nextKeyPairs: nextKeyPairs })
 
   const events = identity.keyEventLog;
   events.forEach((event, index) => {
@@ -50,4 +50,15 @@ import assert from 'node:assert';
       console.log('passed: key commitment')
     }
   });
+
+  const encrypted = identity.encrypt({ data: 'hello world' })
+  const decrypted = identity.decrypt({ data: encrypted })
+  assert.equal(decrypted, 'hello world', 'encryption/decryption failed')
+  console.log('passed: encryption/decryption')
+
+  identity.destroy()
+  assert.equal(identity.keyEventLog.length, 0, 'destroy failed')
+
+  console.log('passed: all tests')
+
 }())

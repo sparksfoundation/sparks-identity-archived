@@ -1,19 +1,22 @@
 import { KeyPairs, PublicSigningKey } from '../forge/types.js';
 
-declare type InceptProps = undefined | {
+declare type InceptProps = {
     keyPairs: KeyPairs;
     nextKeyPairs: KeyPairs;
     backers?: PublicSigningKey[];
 };
-declare type RotateProps = undefined | {
+declare type RotateProps = {
     keyPairs: KeyPairs;
     nextKeyPairs: KeyPairs;
+    backers?: PublicSigningKey[];
+};
+declare type DestroyProps = {
     backers?: PublicSigningKey[];
 };
 interface IdentityInterface {
     incept(args?: InceptProps): void | never;
     rotate(args?: RotateProps): void | never;
-    destroy(): void | never;
+    destroy(args?: DestroyProps): void | never;
     encrypt({ data, publicKey, sharedKey }: {
         data: object | string;
         publicKey?: string;
@@ -43,16 +46,16 @@ declare class Identity implements IdentityInterface {
     constructor();
     get identifier(): string;
     get keyEventLog(): object[];
-    incept(args?: InceptProps): void;
-    rotate(args?: RotateProps): void;
-    destroy(): void;
+    incept({ keyPairs, nextKeyPairs, backers }: InceptProps): void;
+    rotate({ keyPairs, nextKeyPairs, backers }: RotateProps): void;
+    destroy({ backers }: DestroyProps): void;
     encrypt({ data, publicKey, sharedKey }: {
         data: object | string;
         publicKey?: string;
         sharedKey?: string;
     }): string;
     decrypt({ data, publicKey, sharedKey }: {
-        data: object | string;
+        data: string;
         publicKey?: string;
         sharedKey?: string;
     }): string;

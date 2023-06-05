@@ -28,8 +28,10 @@ class Identity {
   get keyEventLog() {
     return __privateGet(this, _keyEventLog);
   }
-  incept(args) {
-    let { keyPairs, nextKeyPairs, backers = [] } = args || {};
+  incept({ keyPairs, nextKeyPairs, backers = [] }) {
+    if (__privateGet(this, _identifier) || __privateGet(this, _keyEventLog)?.length) {
+      throw Error("Identity already incepted");
+    }
     if (!keyPairs) {
       throw new Error("Key pairs required for inception");
     }
@@ -59,9 +61,8 @@ class Identity {
     __privateSet(this, _identifier, identifier);
     __privateSet(this, _keyEventLog, [inceptionEvent]);
   }
-  rotate(args) {
-    let { keyPairs, nextKeyPairs, backers = [] } = args || {};
-    if (!__privateGet(this, _identifier) || !__privateGet(this, _keyEventLog).length) {
+  rotate({ keyPairs, nextKeyPairs, backers = [] }) {
+    if (!__privateGet(this, _identifier) || !__privateGet(this, _keyEventLog)?.length) {
       throw Error("Keys can not be rotated before inception");
     }
     if (!keyPairs) {
@@ -69,6 +70,9 @@ class Identity {
     }
     if (!nextKeyPairs) {
       throw new Error("Next signing key committment required for rotation");
+    }
+    if (__privateGet(this, _keyEventLog)[__privateGet(this, _keyEventLog).length - 1].eventType === "destruction") {
+      throw new Error("Keys can not be rotated after destruction");
     }
     __privateSet(this, _keyPairs, keyPairs);
     const oldKeyEvent = __privateGet(this, _keyEventLog)[__privateGet(this, _keyEventLog).length - 1];
@@ -92,24 +96,77 @@ class Identity {
     rotationEvent.selfAddressingIdentifier = signedEventHash;
     __privateGet(this, _keyEventLog).push(rotationEvent);
   }
-  destroy() {
+  destroy({ backers = [] }) {
+    if (!__privateGet(this, _identifier) || !__privateGet(this, _keyEventLog)?.length) {
+      throw Error("Identity does not exist");
+    }
+    const oldKeyEvent = __privateGet(this, _keyEventLog)[__privateGet(this, _keyEventLog).length - 1];
+    const publicSigningKey = __privateGet(this, _keyPairs).signing.publicKey;
+    const rotationEvent = {
+      identifier: __privateGet(this, _identifier),
+      eventIndex: (parseInt(oldKeyEvent.eventIndex) + 1).toString(),
+      eventType: "destruction",
+      signingThreshold: oldKeyEvent.signingThreshold,
+      signingKeys: [publicSigningKey],
+      nextKeyCommitments: [],
+      backerThreshold: oldKeyEvent.backerThreshold,
+      backers: [...backers]
+    };
+    const eventJSON = JSON.stringify(rotationEvent);
+    const version = "KERI10JSON" + eventJSON.length.toString(16).padStart(6, "0") + "_";
+    const hashedEvent = util.encodeBase64(blake3(eventJSON));
+    const signedEventHash = this.sign({ message: hashedEvent, detached: true });
+    rotationEvent.version = version;
+    rotationEvent.selfAddressingIdentifier = signedEventHash;
+    __privateGet(this, _keyEventLog).push(rotationEvent);
   }
   encrypt({ data, publicKey, sharedKey }) {
     if (!__privateGet(this, _keyPairs)) {
-      throw new Error("No current keys");
+      throw new Error("No key pairs found, please import or incept identity");
     }
-    const dataString = typeof data === "string" ? data : this.__parseJSON(data);
-    const secreKeyUint = util.decodeBase64(__privateGet(this, _keyPairs).encryption.secretKey);
+    const utfData = typeof data === "string" ? data : JSON.stringify(data);
+    const uintData = util.decodeUTF8(utfData);
     const nonce = nacl.randomBytes(nacl.box.nonceLength);
-    const message = util.decodeUTF8(dataString);
-    const box = nacl.secretbox(message, nonce, secreKeyUint);
+    let box;
+    if (publicKey) {
+      const publicKeyUint = util.decodeBase64(publicKey);
+      box = nacl.box(uintData, nonce, publicKeyUint, util.decodeBase64(__privateGet(this, _keyPairs).encryption.secretKey));
+    } else if (sharedKey) {
+      const sharedKeyUint = util.decodeBase64(sharedKey);
+      box = nacl.box.after(uintData, nonce, sharedKeyUint);
+    } else {
+      const secreKeyUint = util.decodeBase64(__privateGet(this, _keyPairs).encryption.secretKey);
+      box = nacl.secretbox(uintData, nonce, secreKeyUint);
+    }
     const encrypted = new Uint8Array(nonce.length + box.length);
     encrypted.set(nonce);
     encrypted.set(box, nonce.length);
     return util.encodeBase64(encrypted);
   }
   decrypt({ data, publicKey, sharedKey }) {
-    return "";
+    if (!__privateGet(this, _keyPairs)) {
+      throw new Error("No key pairs found, please import or incept identity");
+    }
+    const uintData = util.decodeBase64(data);
+    const nonce = uintData.slice(0, nacl.secretbox.nonceLength);
+    const message = uintData.slice(nacl.secretbox.nonceLength, uintData.length);
+    let decrypted;
+    if (publicKey) {
+      const publicKeyUint = util.decodeBase64(publicKey);
+      decrypted = nacl.box.open(message, nonce, publicKeyUint, util.decodeBase64(__privateGet(this, _keyPairs).encryption.secretKey));
+    } else if (sharedKey) {
+      const sharedKeyUint = util.decodeBase64(sharedKey);
+      decrypted = nacl.box.open.after(message, nonce, sharedKeyUint);
+    } else {
+      const secreKeyUint = util.decodeBase64(__privateGet(this, _keyPairs).encryption.secretKey);
+      decrypted = nacl.secretbox.open(message, nonce, secreKeyUint);
+    }
+    if (!decrypted) {
+      throw new Error("Could not decrypt message");
+    }
+    const utf8Result = util.encodeUTF8(decrypted);
+    const result = this.__parseJSON(utf8Result) || utf8Result;
+    return result;
   }
   sign({ message, detached = false }) {
     if (typeof message !== "string") {
@@ -122,7 +179,7 @@ class Identity {
   }
   verify({ publicKey, signature, message }) {
     if (!!message) {
-      if (typeof message !== "string" && !message instanceof String) {
+      if (typeof message !== "string") {
         message = util.decodeUTF8(this.__parseJSON(message));
       }
       message = util.decodeUTF8(message);
