@@ -3,6 +3,7 @@ import { KeyPairs, PublicKeys } from "../forge/types"
 import nacl from "tweetnacl";
 
 export class PostMessage {
+  #source: Window;
   #keyPairs: KeyPairs;
   #sharedKey: string;
   #listeners: Map<Function, Function>;
@@ -22,13 +23,14 @@ export class PostMessage {
     return baseSharedKey
   }
 
-  constructor({ keyPairs, encrypt, decrypt, sign, verify }) {
+  constructor({ keyPairs, encrypt, decrypt, sign, verify, source }) {
     this.#keyPairs = keyPairs;
     this.#encrypt = encrypt;
     this.#decrypt = decrypt;
     this.#sign = sign;
     this.#verify = verify;
     this.#listeners = new Map();
+    window = source || window;
     window.addEventListener('beforeunload', async () => {
       await this.disconnect()
     })
@@ -39,12 +41,12 @@ export class PostMessage {
       const origin = new URL(url).origin;
 
       const handler = (event) => {
-        if (event.data.type !== 'connect') return;
+        if (event.data.type !== 'connectionRequest') return;
         if (event.origin !== origin) return;
         if (!event.data.publicKeys) return;
 
         event.source.postMessage({
-          type: 'connected',
+          type: 'connectionConfirmation',
           publicKeys: {
             signing: this.#keyPairs.signing.publicKey,
             encryption: this.#keyPairs.encryption.publicKey,
@@ -55,7 +57,7 @@ export class PostMessage {
         this.origin = event.origin;
         this.publicKeys = event.data.publicKeys;
         this.#sharedKey = PostMessage.generateSharedKey({ keyPairs: this.#keyPairs, publicKeys: this.publicKeys });
-
+        this.target.postMessage({ type: 'connected' }, this.origin);
         window.removeEventListener('message', handler);
         resolve(this);
       }
@@ -71,7 +73,7 @@ export class PostMessage {
 
       const interval = setInterval(() => {
         target.postMessage({
-          type: 'connect',
+          type: 'connectionRequest',
           publicKeys: {
             signing: this.#keyPairs.signing.publicKey,
             encryption: this.#keyPairs.encryption.publicKey,
@@ -81,19 +83,18 @@ export class PostMessage {
 
       const handler = (event) => {
         if (event.origin !== origin) return;
-        if (event.data.type !== 'connected') return;
+        if (event.data.type !== 'connectionConfirmation') return;
         if (!event.data.publicKeys) return;
 
         this.target = target;
         this.origin = origin;
         this.publicKeys = event.data.publicKeys;
         this.#sharedKey = PostMessage.generateSharedKey({ keyPairs: this.#keyPairs, publicKeys: this.publicKeys });
-
+        this.target.postMessage({ type: 'connected' }, this.origin);
         window.removeEventListener('message', handler);
         clearInterval(interval);
         resolve(this);
       }
-
       window.addEventListener('message', handler);
     })
   }
@@ -110,8 +111,8 @@ export class PostMessage {
           resolve(true);
         }
       };
+      this.target.postMessage({ type: 'disconnected' }, this.origin);
       window.addEventListener('message', handleDisconnect);
-      this.target.postMessage({ type: 'disconnect' }, this.origin);
     });
   }
 
@@ -137,7 +138,7 @@ export class PostMessage {
   }
 
   on(eventType, callback) {
-    const allowed = ['message', 'connected', 'disconnect']
+    const allowed =  ['message', 'disconnected', 'connected']
     if (!allowed.includes(eventType)) return;
 
     const listener = (event) => {
@@ -146,10 +147,13 @@ export class PostMessage {
         event.origin === this.origin &&
         event.data?.type === eventType
       ) {
-        const message = event.data?.type === 'message' ?
-          this.#decrypt({ data: event.data.message, sharedKey: this.#sharedKey }) :
-          event.data.message;
-
+        if (event.data?.type !== 'message') {
+          return callback(event.data.message)
+        }
+        const { signature, ciphertext } = event.data.message;
+        const verified = this.#verify({ data: ciphertext, signature, publicKey: this.publicKeys.signing });
+        if (!verified) return;
+        const message = this.#decrypt({ data: ciphertext, sharedKey: this.#sharedKey });
         callback(message);
       }
     };

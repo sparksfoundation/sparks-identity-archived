@@ -4,11 +4,12 @@
 
 
 var _chunkSIAYTN4Tcjs = require('../chunk-SIAYTN4T.cjs');
-var _keyPairs, _sharedKey, _listeners, _encrypt, _decrypt, _sign, _verify;
+var _source, _keyPairs, _sharedKey, _listeners, _encrypt, _decrypt, _sign, _verify;
 var _tweetnaclutil = require('tweetnacl-util'); var _tweetnaclutil2 = _interopRequireDefault(_tweetnaclutil);
 var _tweetnacl = require('tweetnacl'); var _tweetnacl2 = _interopRequireDefault(_tweetnacl);
 const _PostMessage = class {
-  constructor({ keyPairs, encrypt, decrypt, sign, verify }) {
+  constructor({ keyPairs, encrypt, decrypt, sign, verify, source }) {
+    _chunkSIAYTN4Tcjs.__privateAdd.call(void 0, this, _source, void 0);
     _chunkSIAYTN4Tcjs.__privateAdd.call(void 0, this, _keyPairs, void 0);
     _chunkSIAYTN4Tcjs.__privateAdd.call(void 0, this, _sharedKey, void 0);
     _chunkSIAYTN4Tcjs.__privateAdd.call(void 0, this, _listeners, void 0);
@@ -25,6 +26,7 @@ const _PostMessage = class {
     _chunkSIAYTN4Tcjs.__privateSet.call(void 0, this, _sign, sign);
     _chunkSIAYTN4Tcjs.__privateSet.call(void 0, this, _verify, verify);
     _chunkSIAYTN4Tcjs.__privateSet.call(void 0, this, _listeners, /* @__PURE__ */ new Map());
+    window = source || window;
     window.addEventListener("beforeunload", async () => {
       await this.disconnect();
     });
@@ -40,14 +42,14 @@ const _PostMessage = class {
     return new Promise((resolve, reject) => {
       const origin = new URL(url).origin;
       const handler = (event) => {
-        if (event.data.type !== "connect")
+        if (event.data.type !== "connectionRequest")
           return;
         if (event.origin !== origin)
           return;
         if (!event.data.publicKeys)
           return;
         event.source.postMessage({
-          type: "connected",
+          type: "connectionConfirmation",
           publicKeys: {
             signing: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey,
             encryption: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).encryption.publicKey
@@ -57,6 +59,7 @@ const _PostMessage = class {
         this.origin = event.origin;
         this.publicKeys = event.data.publicKeys;
         _chunkSIAYTN4Tcjs.__privateSet.call(void 0, this, _sharedKey, _PostMessage.generateSharedKey({ keyPairs: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs), publicKeys: this.publicKeys }));
+        this.target.postMessage({ type: "connected" }, this.origin);
         window.removeEventListener("message", handler);
         resolve(this);
       };
@@ -71,7 +74,7 @@ const _PostMessage = class {
         return reject(new Error("Failed to open window"));
       const interval = setInterval(() => {
         target.postMessage({
-          type: "connect",
+          type: "connectionRequest",
           publicKeys: {
             signing: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).signing.publicKey,
             encryption: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).encryption.publicKey
@@ -81,7 +84,7 @@ const _PostMessage = class {
       const handler = (event) => {
         if (event.origin !== origin)
           return;
-        if (event.data.type !== "connected")
+        if (event.data.type !== "connectionConfirmation")
           return;
         if (!event.data.publicKeys)
           return;
@@ -89,6 +92,7 @@ const _PostMessage = class {
         this.origin = origin;
         this.publicKeys = event.data.publicKeys;
         _chunkSIAYTN4Tcjs.__privateSet.call(void 0, this, _sharedKey, _PostMessage.generateSharedKey({ keyPairs: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs), publicKeys: this.publicKeys }));
+        this.target.postMessage({ type: "connected" }, this.origin);
         window.removeEventListener("message", handler);
         clearInterval(interval);
         resolve(this);
@@ -104,8 +108,8 @@ const _PostMessage = class {
           resolve(true);
         }
       };
+      this.target.postMessage({ type: "disconnected" }, this.origin);
       window.addEventListener("message", handleDisconnect);
-      this.target.postMessage({ type: "disconnect" }, this.origin);
     });
   }
   send(data) {
@@ -125,12 +129,19 @@ const _PostMessage = class {
     });
   }
   on(eventType, callback) {
-    const allowed = ["message", "connected", "disconnect"];
+    const allowed = ["message", "disconnected", "connected"];
     if (!allowed.includes(eventType))
       return;
     const listener = (event) => {
       if (event.source === this.target && event.origin === this.origin && _optionalChain([event, 'access', _ => _.data, 'optionalAccess', _2 => _2.type]) === eventType) {
-        const message = _optionalChain([event, 'access', _3 => _3.data, 'optionalAccess', _4 => _4.type]) === "message" ? _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _decrypt).call(this, { data: event.data.message, sharedKey: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _sharedKey) }) : event.data.message;
+        if (_optionalChain([event, 'access', _3 => _3.data, 'optionalAccess', _4 => _4.type]) !== "message") {
+          return callback(event.data.message);
+        }
+        const { signature, ciphertext } = event.data.message;
+        const verified = _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _verify).call(this, { data: ciphertext, signature, publicKey: this.publicKeys.signing });
+        if (!verified)
+          return;
+        const message = _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _decrypt).call(this, { data: ciphertext, sharedKey: _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _sharedKey) });
         callback(message);
       }
     };
@@ -139,6 +150,7 @@ const _PostMessage = class {
   }
 };
 let PostMessage = _PostMessage;
+_source = new WeakMap();
 _keyPairs = new WeakMap();
 _sharedKey = new WeakMap();
 _listeners = new WeakMap();

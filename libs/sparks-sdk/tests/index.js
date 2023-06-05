@@ -3,7 +3,7 @@ import { blake3 } from '@noble/hashes/blake3';
 import { Identity } from "../lib/agents/index.js";
 import * as forge from "../lib/forge/index.js";
 import assert from 'node:assert';
-import { MockTarget } from "./mocks/Target.js";
+import MockWindow from "./mocks/MockWindow.js";
 import { PostMessage } from "../lib/channels/index.js";
 
 (async function () {
@@ -32,9 +32,9 @@ import { PostMessage } from "../lib/channels/index.js";
   events.forEach((event, index) => {
     // what's happening here... it's checking that the event hasn't been tampered with
     const { selfAddressingIdentifier, version, ...eventBody } = event;
-    const message = util.encodeBase64(blake3(JSON.stringify(eventBody)));
+    const data = util.encodeBase64(blake3(JSON.stringify(eventBody)));
     const dataInTact = identity.verify({
-      message,
+      data,
       signature: selfAddressingIdentifier,
       publicKey: event.signingKeys[0],
     });
@@ -73,23 +73,36 @@ import { PostMessage } from "../lib/channels/index.js";
   bob.incept({ keyPairs, nextKeyPairs })
 
   // give alice a mock window at port 4000
-  global.window = new MockTarget('http://localhost:4000');
-  const aliceConn = alice.addConnection(PostMessage)
+  global.window = new MockWindow('http://localhost:3000');
+  const aliceConn = alice.addConnection(PostMessage);
 
   // give bob a mock window at port 3000
-  global.window = new MockTarget('http://localhost:3000');
-  const bobConn = bob.addConnection(PostMessage)
+  const bobConn = bob.addConnection(PostMessage);
 
   // bob accepts alice's connection request
-  bobConn.accept({ url: 'http://localhost:4000' })
-
-  // alice connects to bob
+  bobConn.accept({ url: 'http://localhost:3000' })
+  bobConn.on('message', async (message) => {
+    console.log('passed: bob received message', message)
+    await bobConn.disconnect()
+  })
   bobConn.on('connected', () => {
-    console.log('passed: connection')
+    console.log('passed: bob received connected')
+  })
+  bobConn.on('disconnected', () => {
+    console.log('passed: bob received disconnected')
   })
 
-  await aliceConn.connect({ url: 'http://localhost:3000' })
-  aliceConn.send({ data: 'hello bob' })
+  aliceConn.on('connected', async () => {
+    console.log('passed: alice received connected')
+  })
+  aliceConn.on('disconnected', () => {
+    console.log('passed: alice received disconnected')
+  })
+
+  aliceConn.connect({ url: 'http://localhost:3000' })
+  .then(async () => {
+    await aliceConn.send({ data: 'hello bob' })
+  })
 
   console.log('passed: all tests')
 }())

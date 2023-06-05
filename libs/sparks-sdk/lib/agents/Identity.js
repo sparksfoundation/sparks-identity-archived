@@ -65,7 +65,7 @@ class Identity {
     const eventJSON = JSON.stringify(inceptionEvent);
     const version = "KERI10JSON" + eventJSON.length.toString(16).padStart(6, "0") + "_";
     const hashedEvent = util.encodeBase64(blake3(eventJSON));
-    const signedEventHash = this.sign({ message: hashedEvent, detached: true });
+    const signedEventHash = this.sign({ data: hashedEvent, detached: true });
     inceptionEvent.version = version;
     inceptionEvent.selfAddressingIdentifier = signedEventHash;
     __privateSet(this, _identifier, identifier);
@@ -101,7 +101,7 @@ class Identity {
     const eventJSON = JSON.stringify(rotationEvent);
     const version = "KERI10JSON" + eventJSON.length.toString(16).padStart(6, "0") + "_";
     const hashedEvent = util.encodeBase64(blake3(eventJSON));
-    const signedEventHash = this.sign({ message: hashedEvent, detached: true });
+    const signedEventHash = this.sign({ data: hashedEvent, detached: true });
     rotationEvent.version = version;
     rotationEvent.selfAddressingIdentifier = signedEventHash;
     __privateGet(this, _keyEventLog).push(rotationEvent);
@@ -126,7 +126,7 @@ class Identity {
     const eventJSON = JSON.stringify(rotationEvent);
     const version = "KERI10JSON" + eventJSON.length.toString(16).padStart(6, "0") + "_";
     const hashedEvent = util.encodeBase64(blake3(eventJSON));
-    const signedEventHash = this.sign({ message: hashedEvent, detached: true });
+    const signedEventHash = this.sign({ data: hashedEvent, detached: true });
     rotationEvent.version = version;
     rotationEvent.selfAddressingIdentifier = signedEventHash;
     __privateGet(this, _keyEventLog).push(rotationEvent);
@@ -158,19 +158,19 @@ class Identity {
     if (!__privateGet(this, _keyPairs)) {
       throw new Error("No key pairs found, please import or incept identity");
     }
-    const uintData = util.decodeBase64(data);
-    const nonce = uintData.slice(0, nacl.secretbox.nonceLength);
-    const message = uintData.slice(nacl.secretbox.nonceLength, uintData.length);
+    const uintDataAndNonce = util.decodeBase64(data);
+    const nonce = uintDataAndNonce.slice(0, nacl.secretbox.nonceLength);
+    const uintData = uintDataAndNonce.slice(nacl.secretbox.nonceLength, uintDataAndNonce.length);
     let decrypted;
     if (publicKey) {
       const publicKeyUint = util.decodeBase64(publicKey);
-      decrypted = nacl.box.open(message, nonce, publicKeyUint, util.decodeBase64(__privateGet(this, _keyPairs).encryption.secretKey));
+      decrypted = nacl.box.open(uintData, nonce, publicKeyUint, util.decodeBase64(__privateGet(this, _keyPairs).encryption.secretKey));
     } else if (sharedKey) {
       const sharedKeyUint = util.decodeBase64(sharedKey);
-      decrypted = nacl.box.open.after(message, nonce, sharedKeyUint);
+      decrypted = nacl.box.open.after(uintData, nonce, sharedKeyUint);
     } else {
       const secreKeyUint = util.decodeBase64(__privateGet(this, _keyPairs).encryption.secretKey);
-      decrypted = nacl.secretbox.open(message, nonce, secreKeyUint);
+      decrypted = nacl.secretbox.open(uintData, nonce, secreKeyUint);
     }
     if (!decrypted) {
       throw new Error("Could not decrypt message");
@@ -179,26 +179,26 @@ class Identity {
     const result = this.__parseJSON(utf8Result) || utf8Result;
     return result;
   }
-  sign({ message, detached = false }) {
-    if (typeof message !== "string") {
-      message = this.__parseJSON(message);
+  sign({ data, detached = false }) {
+    if (typeof data !== "string") {
+      data = this.__parseJSON(data);
     }
-    const uintMessage = util.decodeUTF8(message);
+    const uintData = util.decodeUTF8(data);
     const uintSecretKey = util.decodeBase64(__privateGet(this, _keyPairs).signing.secretKey);
-    const signature = detached ? util.encodeBase64(nacl.sign.detached(uintMessage, uintSecretKey)) : util.encodeBase64(nacl.sign(uintMessage, uintSecretKey));
+    const signature = detached ? util.encodeBase64(nacl.sign.detached(uintData, uintSecretKey)) : util.encodeBase64(nacl.sign(uintData, uintSecretKey));
     return signature;
   }
-  verify({ publicKey, signature, message }) {
-    if (!!message) {
-      if (typeof message !== "string") {
-        message = util.decodeUTF8(this.__parseJSON(message));
+  verify({ publicKey, signature, data }) {
+    if (!!data) {
+      if (typeof data !== "string") {
+        data = util.decodeUTF8(this.__parseJSON(data));
       }
-      message = util.decodeUTF8(message);
+      data = util.decodeUTF8(data);
     }
     const uintSignature = util.decodeBase64(signature);
     const uintPublicKey = util.decodeBase64(publicKey);
-    if (message) {
-      return nacl.sign.detached.verify(message, uintSignature, uintPublicKey);
+    if (data) {
+      return nacl.sign.detached.verify(data, uintSignature, uintPublicKey);
     } else {
       const uintResult = nacl.sign.open(uintSignature, uintPublicKey);
       if (uintResult === null)

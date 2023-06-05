@@ -65,7 +65,7 @@ class Identity {
     const eventJSON = JSON.stringify(inceptionEvent);
     const version = "KERI10JSON" + eventJSON.length.toString(16).padStart(6, "0") + "_";
     const hashedEvent = _tweetnaclutil2.default.encodeBase64(_blake3.blake3.call(void 0, eventJSON));
-    const signedEventHash = this.sign({ message: hashedEvent, detached: true });
+    const signedEventHash = this.sign({ data: hashedEvent, detached: true });
     inceptionEvent.version = version;
     inceptionEvent.selfAddressingIdentifier = signedEventHash;
     _chunkSIAYTN4Tcjs.__privateSet.call(void 0, this, _identifier, identifier);
@@ -101,7 +101,7 @@ class Identity {
     const eventJSON = JSON.stringify(rotationEvent);
     const version = "KERI10JSON" + eventJSON.length.toString(16).padStart(6, "0") + "_";
     const hashedEvent = _tweetnaclutil2.default.encodeBase64(_blake3.blake3.call(void 0, eventJSON));
-    const signedEventHash = this.sign({ message: hashedEvent, detached: true });
+    const signedEventHash = this.sign({ data: hashedEvent, detached: true });
     rotationEvent.version = version;
     rotationEvent.selfAddressingIdentifier = signedEventHash;
     _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog).push(rotationEvent);
@@ -126,7 +126,7 @@ class Identity {
     const eventJSON = JSON.stringify(rotationEvent);
     const version = "KERI10JSON" + eventJSON.length.toString(16).padStart(6, "0") + "_";
     const hashedEvent = _tweetnaclutil2.default.encodeBase64(_blake3.blake3.call(void 0, eventJSON));
-    const signedEventHash = this.sign({ message: hashedEvent, detached: true });
+    const signedEventHash = this.sign({ data: hashedEvent, detached: true });
     rotationEvent.version = version;
     rotationEvent.selfAddressingIdentifier = signedEventHash;
     _chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyEventLog).push(rotationEvent);
@@ -158,19 +158,19 @@ class Identity {
     if (!_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs)) {
       throw new Error("No key pairs found, please import or incept identity");
     }
-    const uintData = _tweetnaclutil2.default.decodeBase64(data);
-    const nonce = uintData.slice(0, _tweetnacl2.default.secretbox.nonceLength);
-    const message = uintData.slice(_tweetnacl2.default.secretbox.nonceLength, uintData.length);
+    const uintDataAndNonce = _tweetnaclutil2.default.decodeBase64(data);
+    const nonce = uintDataAndNonce.slice(0, _tweetnacl2.default.secretbox.nonceLength);
+    const uintData = uintDataAndNonce.slice(_tweetnacl2.default.secretbox.nonceLength, uintDataAndNonce.length);
     let decrypted;
     if (publicKey) {
       const publicKeyUint = _tweetnaclutil2.default.decodeBase64(publicKey);
-      decrypted = _tweetnacl2.default.box.open(message, nonce, publicKeyUint, _tweetnaclutil2.default.decodeBase64(_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).encryption.secretKey));
+      decrypted = _tweetnacl2.default.box.open(uintData, nonce, publicKeyUint, _tweetnaclutil2.default.decodeBase64(_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).encryption.secretKey));
     } else if (sharedKey) {
       const sharedKeyUint = _tweetnaclutil2.default.decodeBase64(sharedKey);
-      decrypted = _tweetnacl2.default.box.open.after(message, nonce, sharedKeyUint);
+      decrypted = _tweetnacl2.default.box.open.after(uintData, nonce, sharedKeyUint);
     } else {
       const secreKeyUint = _tweetnaclutil2.default.decodeBase64(_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).encryption.secretKey);
-      decrypted = _tweetnacl2.default.secretbox.open(message, nonce, secreKeyUint);
+      decrypted = _tweetnacl2.default.secretbox.open(uintData, nonce, secreKeyUint);
     }
     if (!decrypted) {
       throw new Error("Could not decrypt message");
@@ -179,26 +179,26 @@ class Identity {
     const result = this.__parseJSON(utf8Result) || utf8Result;
     return result;
   }
-  sign({ message, detached = false }) {
-    if (typeof message !== "string") {
-      message = this.__parseJSON(message);
+  sign({ data, detached = false }) {
+    if (typeof data !== "string") {
+      data = this.__parseJSON(data);
     }
-    const uintMessage = _tweetnaclutil2.default.decodeUTF8(message);
+    const uintData = _tweetnaclutil2.default.decodeUTF8(data);
     const uintSecretKey = _tweetnaclutil2.default.decodeBase64(_chunkSIAYTN4Tcjs.__privateGet.call(void 0, this, _keyPairs).signing.secretKey);
-    const signature = detached ? _tweetnaclutil2.default.encodeBase64(_tweetnacl2.default.sign.detached(uintMessage, uintSecretKey)) : _tweetnaclutil2.default.encodeBase64(_tweetnacl2.default.sign(uintMessage, uintSecretKey));
+    const signature = detached ? _tweetnaclutil2.default.encodeBase64(_tweetnacl2.default.sign.detached(uintData, uintSecretKey)) : _tweetnaclutil2.default.encodeBase64(_tweetnacl2.default.sign(uintData, uintSecretKey));
     return signature;
   }
-  verify({ publicKey, signature, message }) {
-    if (!!message) {
-      if (typeof message !== "string") {
-        message = _tweetnaclutil2.default.decodeUTF8(this.__parseJSON(message));
+  verify({ publicKey, signature, data }) {
+    if (!!data) {
+      if (typeof data !== "string") {
+        data = _tweetnaclutil2.default.decodeUTF8(this.__parseJSON(data));
       }
-      message = _tweetnaclutil2.default.decodeUTF8(message);
+      data = _tweetnaclutil2.default.decodeUTF8(data);
     }
     const uintSignature = _tweetnaclutil2.default.decodeBase64(signature);
     const uintPublicKey = _tweetnaclutil2.default.decodeBase64(publicKey);
-    if (message) {
-      return _tweetnacl2.default.sign.detached.verify(message, uintSignature, uintPublicKey);
+    if (data) {
+      return _tweetnacl2.default.sign.detached.verify(data, uintSignature, uintPublicKey);
     } else {
       const uintResult = _tweetnacl2.default.sign.open(uintSignature, uintPublicKey);
       if (uintResult === null)

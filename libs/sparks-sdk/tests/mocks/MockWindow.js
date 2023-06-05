@@ -1,9 +1,21 @@
-export class MockTarget {
-  constructor(origin, name, specs) {
-    this.name = name;
-    this.specs = specs;
+class MockWindow {
+  static windows = {};
+
+  constructor(origin) {
     this.origin = origin;
     this.messageListeners = [];
+    this.opener = null;
+    MockWindow.windows[origin] = this;
+  }
+
+  open(origin, name, specs) {
+    if (MockWindow.windows[origin]) {
+      MockWindow.windows[origin].opener = this;
+      return MockWindow.windows[origin];
+    }
+    this.name = name;
+    this.origin = origin;
+    return this;
   }
 
   addEventListener(event, callback) {
@@ -31,8 +43,6 @@ export class MockTarget {
       this.messageListeners.forEach(callback => callback(event));
     }
   }
-
-  open(origin, name, specs) {
-    return new MockTarget(origin, name, specs);
-  }
 }
+
+export default MockWindow;

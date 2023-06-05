@@ -9,12 +9,13 @@ declare class PostMessage {
         keyPairs: any;
         publicKeys: any;
     }): string;
-    constructor({ keyPairs, encrypt, decrypt, sign, verify }: {
+    constructor({ keyPairs, encrypt, decrypt, sign, verify, source }: {
         keyPairs: any;
         encrypt: any;
         decrypt: any;
         sign: any;
         verify: any;
+        source: any;
     });
     accept({ url }: {
         url: any;

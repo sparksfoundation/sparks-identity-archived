@@ -104,6 +104,9 @@ importers:
       scrypt-pbkdf:
         specifier: ^1.1.1
         version: 1.1.1
+      sparks-sdk:
+        specifier: workspace:*
+        version: link:../../libs/sparks-sdk
       sparks-ui:
         specifier: workspace:*
         version: link:../../libs/sparks-ui

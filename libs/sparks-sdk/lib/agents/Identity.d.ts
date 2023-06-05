@@ -27,14 +27,14 @@ interface IdentityInterface {
         publicKey?: string;
         sharedKey?: string;
     }): string;
-    sign({ message, detached }: {
-        message: object | string;
+    sign({ data, detached }: {
+        data: object | string;
         detached?: boolean;
     }): string;
-    verify({ publicKey, signature, message }: {
+    verify({ publicKey, signature, data }: {
         publicKey: string;
         signature: string;
-        message: object | string;
+        data: object | string;
     }): boolean | string;
     toJSON(): object;
     identifier: string;
@@ -68,14 +68,14 @@ declare class Identity implements IdentityInterface {
         publicKey?: string;
         sharedKey?: string;
     }): string;
-    sign({ message, detached }: {
-        message: object | string;
+    sign({ data, detached }: {
+        data: object | string;
         detached?: boolean;
     }): string;
-    verify({ publicKey, signature, message }: {
+    verify({ publicKey, signature, data }: {
         publicKey: any;
         signature: any;
-        message: any;
+        data: any;
     }): any;
     addConnection(Connection: any): any;
     toJSON(): {
