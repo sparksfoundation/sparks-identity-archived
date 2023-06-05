@@ -1,1 +1,0 @@
-export const Lock = () => <h1>Lock</h1>;  

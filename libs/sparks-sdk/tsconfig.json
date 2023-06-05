@@ -1,0 +1,32 @@
+// reference setup repo https://github.com/orabazu/tsup-library-template
+// reference blog guide https://orabazu.hashnode.dev/how-to-bundle-a-tree-shakable-typescript-library-for-web-with-tsup-and-publish-with-npm
+{
+  "compilerOptions": {
+    "declaration": true,
+    "target": "ESNext",
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "strict": true,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "outDir": "lib",
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "rootDir": "src",
+    "emitDeclarationOnly": true,
+    "strictPropertyInitialization": false
+  },
+  "types": [
+    "node",
+    "jest",
+    "tweetnacl",
+    "tweetnacl-util"
+  ],
+  "include": [
+    "src/**/*",
+    "lib/index.d.ts"
+  ]
+}
